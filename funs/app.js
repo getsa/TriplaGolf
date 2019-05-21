@@ -1,4 +1,4 @@
-// Initialize Firebase
+// Initialize Firebase 
 
 //Järjestys:
 // create Empty G_game & G_database & G_myTeam->

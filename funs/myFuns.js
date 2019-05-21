@@ -1,4 +1,4 @@
-
+ 
 //function database
 function Database() {
 	this.players = [];
