@@ -1,0 +1,225 @@
+% Globaalit muuttujat:
+G_game //Tämän hetkinen peli, tyhjä kunnes peli alkaa, luodaan jos keskeneräinen peli löytyy pilvestä
+  G_game.players array
+    player objekti (ID,...)
+  G_game.teams array (array of teams)
+    team arrays (Array of players)
+      player IDs
+  G_game.sports
+    sport array
+
+G_myTeam array
+  player objekti (ID,...)
+
+G_database    - olemassa oleva data, pelaajat, lajit, kisat
+
+
+Pistemuutos G_myTeam:iin --> tallennetaan pilveen --> ladataan pilvestä --> G_game päivittyy pilvidatasta
+
+// Katso localista, onko peli käynnissä --> lataa käynnissä oleva peli G_game:event
+//  Jos ei, niin katso onko joku peli kesken ja ehdota sitä
+
+// Jos laji käynnissä (myGroup.status), avaa ohjelma pelimoodissa, muuten välimoodissa (pistetaulukko + jatka seuraavaan lajiin nappi)
+Local storage:
+  gameID
+  myGroup
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <!--  Game ON screen
+  <div class="w3-container gameOnScr w3-center"
+    style="display: none ; height:80%">
+  	<div class='parButtonDiv'>
+  	<div class='buttonPAR'>
+  	<button id=parButtonE class="w3-button w3-green w3-medium gameOnScr" style="display:none" type="button" onclick=
+  			"changeParNr(-1);
+  			updateTaulukko();">Edellinen</button>
+  	</div>
+  	<div class='buttonPAR'>
+  	<button id=parButtonS class="w3-button w3-green w3-medium gameOnScr" style="display:none" type="button" onclick=
+  			"changeParNr(1);
+  			updateTaulukko();">Seuraava</button>
+  	</div>
+  	</div>
+  -->
+  	<!-- TULOSTAULUKKO
+  	<table class='w3-table w3-small '>
+  		<tr id=rivi0 style="display:none">
+  			<th></th><th id=taul_par>Väylä 1</th><th></th><th></th><th > Yht. +/- </th>
+  		</tr>
+  	  <tr id=rivi1 style="display:none">
+  	    <td id=taul_nimi1></td>
+  			<td id=taul_G1></td>
+  			<td><button class="button1 w3-button w3-green w3-medium w3-block" onclick=
+  				"addScore(G_myGroup[0]);
+  				updateTaulukko(1);"
+  				>+1</button></td>
+  			<td><button class="button1 w3-button w3-green w3-medium w3-block" onclick=
+  				"removeScore(G_myGroup[0]);
+  				updateTaulukko(1);"
+  				>-1</button></td>
+  				<td id=taul_sum1> 0 </td>
+  	  </tr>
+
+  		<tr  id=rivi2 style="display:none">
+  			<td id=taul_nimi2> </td>
+  			<td id=taul_G2></td>
+  			<td><button class="button1 w3-button w3-green w3-medium w3-block" type="button" onclick=
+  				"addScore(G_myGroup[1]);
+  				updateTaulukko(2);"
+  				>+1</button></td>
+  			<td><button class="button1 w3-button w3-green w3-medium w3-block" type="button" onclick=
+  				"removeScore(G_myGroup[1]);
+  				updateTaulukko(2);"
+  				>-1</button></td>
+  			<td id=taul_sum2> 0 </td> </tr>
+
+  		<tr id=rivi3 style="display:none">
+  			<td id=taul_nimi3></td>
+  			<td id=taul_G3></td>
+  			<td><button class="button1 w3-button w3-green w3-medium w3-block" type="button" onclick=
+  				"addScore(G_myGroup[2]);
+  				updateTaulukko(3)"
+  				>+1</button></td>
+  			<td><button class="button1 w3-button w3-green w3-medium w3-block" type="button" onclick=
+  				"removeScore(G_myGroup[2]);
+  				updateTaulukko(3)"
+  				>-1</button></td>
+  			<td id=taul_sum3> 0 </td>
+  		</tr>
+  		<tr  id=rivi4 style="display:none">
+  			<td id=taul_nimi4></td>
+  			<td id=taul_G4></td>
+  			<td><button class="button1 w3-button w3-green w3-medium w3-block" type="button" onclick=
+  				"addScore(G_myGroup[3]);
+  				updateTaulukko(4)"
+  				>+1</button></td>
+  			<td><button class="button1 w3-button w3-green w3-medium w3-block" type="button" onclick=
+  				"removeScore(G_myGroup[3]);
+  				updateTaulukko(4)"
+  				>-1</button></td>
+  				<td id=taul_sum4> 0 </td>
+  		</tr>
+  		<tr  id=rivi5 style="display:none">
+  			<td id=taul_nimi5></td>
+  			<td id=taul_G5></td>
+  			<td><button class="button1 w3-button w3-green w3-medium w3-block" type="button" onclick=
+  				"addScore(G_myGroup[4]);
+  				updateTaulukko(5)"
+  				>+1</button></td>
+  			<td><button class="button1 w3-button w3-green w3-medium w3-block" type="button" onclick=
+  				"removeScore(G_myGroup[4]);
+  				updateTaulukko(5)"
+  				>-1</button></td>
+  				<td id=taul_sum5> 0 </td>
+  		</tr>
+  	</table>
+  	<br>
+  	<br>
+
+  	<p><button id="finishGameButton" type="button"
+  	class="w3-button w3-green w3-large w3-block" style= "display:none" onclick=
+  	"finishGame();
+  	G_scrName='resultScr';
+  	updateScreen();"
+  	>Lopeta kierros</button></p>
+  	<div class="w3-tiny">
+  		Ylimääräsiä nimiä taulukossa? Päivitä webbisivu		</div>
+  </div>
+
+   -->
+
+  <!--  Result screen
+  <div id="resTabDiv" style="display: none"
+    class="resultScr w3-tiny">
+
+  	<table id="resTable">
+  	</table>
+
+  	<button class="w3-button w3-green w3-large w3-block" onclick="
+  	updateScreen();
+  	">Päivitä
+  	</button>
+  	<div>
+  		<table id='pisteJakoTaul'>
+  			<tr><th>Pistejako</th></tr>
+  			<tr><td>1.</td><td>14 pist.</td></tr>
+  			<tr><td>2.</td><td>12 pist.</td></tr>
+  			<tr><td>3.</td><td>10 pist.</td></tr>
+  			<tr><td>4.</td><td>8 pist.</td></tr>
+  			<tr><td>5.</td><td>7 pist.</td></tr>
+  			<tr><td>.</td><td>. pist.</td></tr>
+  			<tr><td>.</td><td>. pist.</td></tr>
+  			<tr><td>11.</td><td>1 pist.</td></tr>
+  		</table>
+  	</div>
+  	<p></p>
+  	<table id="tbody">
+  	</table>
+
+  </div>
+  -->
+  <!--  Final Results screen
+  <div id="finalResTabDiv" style="display: none"
+  	class="finalResultsScr w3-small w3-responsive">
+
+  	<h2>2018 tulokset: </h2>
+  	<table id="finalResultsTableId" class='"w3-table w3-centered'></table>
+  	<hr>
+  	<h2>Golf (Löfkulla Golf)</h2>
+  	<table id="finalGolfResultsTableId" width=" 50 %"></table>
+  	<hr>
+  	<h2>DiscGolf (Oittaan frisbeegolfrata)</h2>
+  	<table id="finalDiscGolfResultsTableId" width="100 %"></table>
+  	<hr>
+  	<h2>MiniGolf (Munkkivuoren minigolf)</h2>
+  	<table id="finalMiniGolfResultsTableId" width="100 %"></table>
+  	<hr>
+  </div>
+   -->
+  <!-- TÄHÄN ALALAATIKKO -->
+
+  <!-- ALABOKSIN MESSAGET -->
+  <!-- <div class="w3-container messageSystem w3-tiny w3-light-grey w3-border" style="height:15%, display:none">
+  		<table class="w3-table" >
+  			<tr>
+  				<td style="width:80%" >
+  					<div class="w3-left-align w3-hoverable w3-cell-column"
+  					style="height:100px ; overflow:auto">
+  						<p id=imes0 style="display:none"></p><p id=imes1 style="display:none"></p>
+  						<p id=imes2 style="display:none"></p><p id=imes3 style="display:none"></p>
+  						<p id=imes4 style="display:none"></p><p id=imes5 style="display:none"></p>
+  						<p id=imes6 style="display:none"></p><p id=imes7 style="display:none"></p>
+  						<p id=imes8 style="display:none"></p><p id=imes9 style="display:none"></p>
+  						<p id=imes10 style="display:none"></p><p id=imes11 style="display:none"></p>
+  						<p id=imes12 style="display:none"></p><p id=imes13 style="display:none"></p>
+  						<p id=imes14 style="display:none"></p><p id=imes15 style="display:none"></p>
+  						<p id=imes16 style="display:none"></p><p id=imes17 style="display:none"></p>
+  						<p id=imes18 style="display:none"></p><p id=imes19 style="display:none"></p>
+  						<p id=imes20 style="display:none"></p><p id=imes21 style="display:none"></p>
+  						<p id=imes22 style="display:none"></p><p id=imes23 style="display:none"></p>
+  					</div>
+  				</td>
+  				<td class="w3-center messageSystem" style="width:20%;display:none">
+  				  <button class="w3-btn w3-teal w3-round-large w3-center-align" onclick="
+  						var message = prompt('Insta viesti:')
+  						if(message != null) {
+  							G_messages.unshift(message)
+  							rollMessages();
+  							saveMessage();}"
+  							>kirjoita</button>
+  				</td>
+  			</tr>
+  		</table>
+  </div> -->

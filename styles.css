@@ -1,0 +1,257 @@
+h1 {text-align:center;}
+p {margin-top: 1px; margin-bottom: 1px; padding: 2px 0px}
+a { cursor: pointer; }
+button{  border-radius: 5px;}
+
+input{
+  padding: 5px
+}
+
+.w3-lobster {
+  font-family: "Lobster", serif;
+}
+
+#navBar {
+  width: 100%;
+  height: 35px;
+
+}
+#infoDiv {
+  width: 100%;
+  height: 55px;
+  border-bottom: solid;
+  border-width: thin;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#loginDiv {
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#titleBox {
+  width: 100%;
+  height: 60px;
+}
+#Title {
+  width: 100%;
+  text-align: center
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 40px;
+}
+
+.footer {
+  position: fixed;
+   left: 0;
+   bottom: 10px;
+   width: 100%;
+   text-align: center;
+}
+
+#gameAppDiv {
+  padding : 10px 10px 10px 10px;
+}
+
+.nimilista {
+  font-size: 20px;
+}
+
+.listaGrid {
+  display: grid;
+  margin : 10px 50px 0px 50px;
+  border-style: none;
+  grid-row-gap: 0px;
+}
+.listaGrid-item {
+  text-align: center;
+  border-style: none;
+}
+
+.resTableSelGrid{
+  display: grid;
+  border-style: none;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  padding: 3px;
+  grid-gap: 2px;
+
+}
+
+.resTableSelGrid-item{
+  text-align: center;
+  border-style: none;
+}
+
+.skabanNimi {
+  margin : 0px 0px 0px 0px;
+  padding : 0px 0px 0px 0px;
+  color : red;
+}
+
+.alaNapitGrid {
+  display: grid;
+  margin : 15px 0px 15px 0px;
+  padding : 10px 50px 10px 50px;
+  border-style: none;
+  grid-row-gap: 10px;
+}
+
+.alaNapitGrid-item {
+  text-align: center;
+  border-style: none;
+
+}
+
+
+.gameGrid {
+  display: grid;
+  grid-template-columns: 2fr 2fr 2fr 2fr 2fr;
+  grid-gap: 3px;
+  grid-row-gap: 10px;
+  padding: 5px;
+  vertical-align: middle;
+  border-style: none;
+}
+
+.gameGrid-item  {
+  /* background-color: rgba(255, 255, 255, 0.8); */
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  padding: 0px 5px 5px 5px;
+  font-size: 18px;
+  border-style: none;
+  margin: 0px 0px 0px 0px;
+}
+
+.firstRowOnGameTable {
+  grid-column: 1 / 6;
+  margin: 5px 0 5px 0;
+  font-size: 22px;
+  font-weight: bold;
+  border-style: none;
+}
+
+.plusMinuBtn {
+  width: 100%;
+  height: 100%;
+}
+
+.topnav {
+  overflow: hidden;
+  background-color: white;
+}
+.topnav a {
+  float: left;
+  color: black;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+.topnav a:hover {
+  background-color: gray;
+  color: black;
+}
+.topnav a.active {
+  background-color: #4CAF50;
+  color: white;
+}
+
+#createNewGameBtn {
+  margin-top: 20px;
+}
+.check-mark {
+  color: green;
+}
+.fixed-list-item {
+  position: fixed;
+}
+
+table {
+    width: 100%
+    /* margin-left: auto; */
+    /* margin-right: auto; */
+    padding: 0px;
+    border-collapse: collapse;
+}
+.w3-table-all {
+  padding: 0px;
+}
+
+.table_condensed {
+  font-size: 10px;
+}
+
+td {
+  /* border: 1px solid #ddd; */
+  padding: 4px;
+  border: 0 px;
+  text-align: center;
+  border-collapse: collapse;
+
+}
+
+tr:hover {background-color: #ddd;}
+tr:nth-child(even){background-color: #f2f2f2}
+
+th{
+      border: 0 px solid #ddd;
+      padding: 4px;
+
+}
+
+img {
+}
+button {
+}
+
+/* inverse colors on hover */
+
+
+.removeObjButton {
+  color: red;
+  border: none;
+  background: none;
+}
+
+
+a:link {
+    text-decoration: none;
+}
+
+a:visited {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+a:active {
+    text-decoration: underline;
+}
+.w3-btn {margin-bottom:2px;}
+
+.button1 {
+  /*float: center;*/
+  padding: 0px 5px;
+  /* width: 70px; */
+}
+.buttonPAR {
+  /*float: center;*/
+  border: 1px solid green;
+  display:inline-block;
+}
+.parButtonDiv{text-align:center}
+.gameOnScr {margin-left: auto;margin-right: auto;}
+.w3-button {padding: 5px 5px;margin-top: 0; margin-bottom: 0; }
+.w3-block {}
