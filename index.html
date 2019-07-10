@@ -16,7 +16,7 @@
 </head>
 
 <body class= "w3-pale-blue">
- 
+
 <!-- <audio autoplay>
 <source src="DG-Putt.mp3" type="audio/mpeg">
 </audio> -->
@@ -29,17 +29,17 @@
 <!--  NAV BAR-->
 <div id="navBar" class="w3-bar w3-border w3-light-grey w3-medium"> </div>
 
-<!-- INFOTAULU -->
-<div id="infoDiv" class="w3-container startScr w3-center w3-large" style="display:block;"> </div>
-
-<!-- user interface from userinterface.js -->
+<!-- UI from userinterface.js -->
 <div id="gameAppDiv" class="w3-container startScr w3-center w3-large"> </div>
 
+<!-- INFOTAULU -->
+<div id="infoDiv" class="w3-container startScr w3-center w3-large" style="display:none;"> </div>
 
-<!-- Button that handles sign-in/sign-out -->
+<!-- sign-in -->
 <div id="loginDiv">
 	<button disabled class="w3-btn w3-blue" id="quickstart-sign-in" >Logging in...</button>
 </div>
+
 
 
 </body>
@@ -55,7 +55,7 @@
 <script src="https://www.gstatic.com/firebasejs/5.1.0/firebase-firestore.js"></script>
 
 <script src="funs/userinterface.js"></script>
-<script src="funs/myFuns.js"></script>
+<script src="funs/myLib.js"></script>
 <script src="funs/app.js"></script>
 
 </html>

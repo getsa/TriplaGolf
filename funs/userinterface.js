@@ -8,15 +8,16 @@ function updateInfoDiv(str) {
 
   $("#infoDiv").append(`
     <div class="w3-container" style="display:block;">
-        <p class="small-text"><a class="w3-small"> Lisää localStoragen nollaus jos haku epäonnistuu!  </a> </p>
+        <p class="small-text"><a class="w3-small"> ${str} </a> </p>
       </div>`);
 }
 
-updateInfoDiv();
+//updateInfoDiv();
 
 function hideNavBar() {
   $("#navBar").empty();
 }
+
 function showNavBar() {
   $("#navBar").append(`
     <a id="NavBtnHome" class="w3-bar-item w3-button w3-padding-small"><i class='material-icons'> home </i> </a>
@@ -26,94 +27,163 @@ function showNavBar() {
     <button disabled id="quickstart-sign-out" class= "w3-button w3-blue w3-bar-item w3-tiny w3-right" href="#"> Sign out</button>
   	`);
 
-    $('#quickstart-sign-out').click( () => toggleSignIn() );
-    $('#NavBtnHome').click( () => startScreen() );
-    $('#NavBtnResults').click( () => showResultTable() );
-    $('#NavBtnJatka').click( () => gameScreen() );
-    $('#NavBtnSettings').click( () => settingsScreen() );
+  $('#quickstart-sign-out').click(() => toggleSignIn());
+  $('#NavBtnHome').click(() => startScreen());
+  $('#NavBtnResults').click(() => showResultTable());
+  $('#NavBtnJatka').click(() => gameScreen());
+  $('#NavBtnSettings').click(() => settingsScreen());
 
-    G_game.name == "empty" && $('#NavBtnResults').hide();
+  G_game.name == "empty" && $('#NavBtnResults').hide();
 
-    if (G_myTeam.name == "empty" || !G_myTeam.name) {
-      $('#NavBtnJatka').hide();
-    }
+  if (G_myTeam.name == "empty" || !G_myTeam.name) {
+    $('#NavBtnJatka').hide();
+  }
 
 }
 
 // Listaa pelit, luo uuden pelin, asettaa G_gamen valittuun, nollaa joukkueen
 function startScreen() {
-  $('#NavBtnHome').hide();
 
-  G_myTeam.status=="sportOn" ? $('#NavBtnJatka').show() : $('#NavBtnJatka').hide();
+  G_myTeam.status == "sportOn" ? $('#NavBtnJatka').show() : $('#NavBtnJatka').hide();
+  G_game.name == "empty" ? $('#NavBtnResults').hide() : $('#NavBtnResults').show();
+
 
   console.log("Näytöllä: startScreen");
-  updateInfoDiv('Lets mennään!');
+  //  updateInfoDiv('Lets mennään!');
   $("#gameAppDiv").empty();
+  listOnGoingGames();
 
-  $("#gameAppDiv").append(`
-    <div class="w3-container">
-      <p id="ContinueGameTag" style="display:none;"> Valitse peli: </p>
-      <div id="gameListID" class= "listaGrid" style="display:none;"></div>
-    </div>
-  	`);
+  function listOnGoingGames() {
+    $("#gameAppDiv").append(`
+      <div class="w3-container">
+        <p id="ContinueGameTag" style="display:none;"> Kesken: </p>
+        <div id="gameListID" class= "listaGrid" style="display:none;"></div>
+      </div>
+      `);
+    console.log(G_database);
 
-  //Listataan pelit:s
-  G_database.games.forEach((game, i) => {
-    $("#gameListID").show();
-    $("#ContinueGameTag").show();
+    //Listataan keskeneräiset pelit
+    G_database.games.forEach((game, i) => {
+      $("#gameListID").show();
+      if (game.status == "gameOn") {
+        $("#ContinueGameTag").show();
 
-    let gamesListItemID = `${game.name}_gamesListItemID`;
-    gamesListItemID = gamesListItemID.replace(/\s+/g, '');
-    $("#gameListID").append(`
-    	<button id="${gamesListItemID}" class="w3-btn w3-amber listaGrid-item" >${game.name}</button><p/>
-    	`);
-    $(`#${gamesListItemID}`).data("gameobj", game);
+        let gamesListItemID = `${game.name}_gamesListItemID`;
+        gamesListItemID = gamesListItemID.replace(/\s+/g, '');
+        $("#gameListID").append(`
+          <button id="${gamesListItemID}" class="w3-btn w3-amber listaGrid-item" >${game.name}</button><p/>
+          `);
+        $(`#${gamesListItemID}`).data("gameobj", game);
 
-    //Valitaan vanha peli:
-    $(`#${gamesListItemID}`).click(function() {
-      let game_obj = $(this).data("gameobj");
-      Object.assign(G_game,game_obj);
-      G_myTeam.gameName = G_game.name;
-      G_myTeam.players = [];
-      selectGroupScreen();
-      $('#NavBtnResults').show();
+        //Valitaan vanha peli:
+        $(`#${gamesListItemID}`).click(function() {
+          let game_obj = $(this).data("gameobj");
+          Object.assign(G_game, game_obj);
+          G_myTeam.gameName = G_game.name;
+          G_myTeam.players = [];
+          chooseResContSet();
+          //selectGroupScreen();
+          //$('#NavBtnResults').show();
+        });
+      }
     });
+  }
+  function chooseResContSet() {
+    $("#gameAppDiv").empty();
 
-  });
+    $("#gameAppDiv").append(`
+        <div class="w3-container">
+          <div id="gameListID" class= "alaNapitGrid" style="display:none;"></div> <p/><p/>
+            <button id="lives_btn" class=" w3-btn w3-green alaNapitGrid-item"> LIVESEURANTA</button><p/>
+            <button id="contGame_btn" class=" w3-btn w3-green alaNapitGrid-item"> PELAA</button><p/>
+            <button id="setGame_btn" class=" w3-btn w3-green alaNapitGrid-item"> Pelin asetukset</button><p/>
+        </div>
+      	`);
+
+    $("#lives_btn").click(() => {
+      showResultTable();
+    });
+    $("#contGame_btn").click(() => {
+      selectGroupScreen();
+    });
+    $("#setGame_btn").click(() => {
+      settingsScreen();
+    });
+  }
 
   $("#gameAppDiv").append(`
     <div class="alaNapitGrid w3-container">
+      <p/>
     	<button id="createNewGameBtn" class="w3-btn w3-green alaNapitGrid-item">Uusi peli</button>
-    </div>
-    	`);
+      <button id="showFinishedGamesBtn" class="w3-btn w3-green alaNapitGrid-item">Vanhat pelit</button>
+      <button id="showSettingsBtn" class="w3-btn w3-green alaNapitGrid-item">Asetukset</button>
+    </div>`);
 
-  document.title = 'TriplaGolf App';
+  $('#createNewGameBtn').click(() => createNewGame());
+  $('#showSettingsBtn').click(() => settingsScreen());
+  $('#showFinishedGamesBtn').click(() => showFinishedGamesScreen());
 
-  $('#createNewGameBtn').click(function() {
+  function createNewGame() {
     if (window.confirm('Uusi peli?')) {
       let name = prompt("Pelin nimi:", "");
       console.log(G_database);
       let existingGame = G_database.games.find(e => e.name === name);
 
       if (existingGame) {
-        if (confirm("Peli on olemassa, haluatko muokata peliä?")) {
+        if (confirm("Saman niminen peli on jo olemassa, haluatko muokata peliä?")) {
           G_game = existingGame;
           G_myTeam.gameName = G_game.name;
           G_myTeam.players = [];
           selectSportsScreen();
         }
-      }
-      else if (name != "") {
+      } else if (name == null) {
+        startScr();
+      } else if (name == "") {
+        alert("Anna pelille nimi!");
+      } else {
         G_game = new Game(name);
         G_myTeam.gameName = G_game.name;
         G_myTeam.players = [];
         selectSportsScreen();
-      } else {
-        alert("Anna pelille nimi!")
       }
     }
-  });
+  }
+
+  //Listataan keskeneräiset pelit
+  // Listaa vanhat loppuun pelatut pelit
+  function showFinishedGamesScreen() {
+    console.log(G_database);
+    $("#ContinueGameTag").text("Vanhat pelit:");
+    $('#showFinishedGamesBtn').text("Keskeneräiset pelit:");
+    $('#showFinishedGamesBtn').click(() => startScreen());
+    $("#gameListID").empty();
+
+    G_database.games.forEach((game, i) => {
+      $("#gameListID").show();
+      if (game.status == "finished") {
+        let gamesListItemID = `${game.name}_gamesListItemID`;
+        gamesListItemID = gamesListItemID.replace(/\s+/g, '');
+        $("#gameListID").append(`
+          <button id="${gamesListItemID}" class="w3-btn w3-amber listaGrid-item" >${game.name}</button><p/>
+          `);
+        $(`#${gamesListItemID}`).data("gameobj", game);
+
+        //Valitaan vanha peli:
+        $(`#${gamesListItemID}`).click(function() {
+          let game_obj = $(this).data("gameobj");
+          Object.assign(G_game, game_obj);
+          G_myTeam.gameName = G_game.name;
+          G_myTeam.players = [];
+          chooseResContSet();
+          //selectGroupScreen();
+          //$('#NavBtnResults').show();
+        });
+      }
+    });
+  }
 }
+
+
 
 //  Luo uudet lajit, lisää valitut lajit gameen (continue tallentaa pelin pilveen)
 function selectSportsScreen() {
@@ -130,11 +200,9 @@ function selectSportsScreen() {
     </div>
 
     <div class="w3-container>
-
       <div class="w3-container">
         <p>Lajit:</p>
       </div>
-
       <div class="sportsListID"></div> <p/>
     </div>
     <div class="w3-container alaNapit">
@@ -164,8 +232,8 @@ function selectSportsScreen() {
   $('#newSportBtn').click(() => {
     $('#id01').slideDown();
   });
-// Päivitä par-inputtien määrä reikämäärän mukaan
-  $('#newSportParNrID').on('input', function() {
+  // Päivitä par-inputtien määrä reikämäärän mukaan
+  $('#newSportParNrID').on('input', () => {
     let parNr = $('#newSportParNrID').val();
     $("#newSportParListID").empty();
     $("#newSportParListID").append("<p>Par/Tavoite:</p>");
@@ -201,7 +269,7 @@ function selectSportsScreen() {
           $(".sportsListID").append(`<button class="w3-btn w3-lime " id='${sportInListID}'>${sportName}</button><p/>`);
           $('#continueBtn').show();
 
-          G_game.sports[sportName] = new Sport(sportName,parNr,[...parList]);
+          G_game.sports[sportName] = new Sport(sportName, parNr, [...parList]);
           console.log('New sport added to the current game:');
           console.log(G_game.sports[sportName]);
           //POISTO
@@ -222,8 +290,10 @@ function selectSportsScreen() {
   });
 
   $('#continueBtn').click(() => {
+    G_game.status = "gameOn";
     saveGame2cloud();
     selectGroupScreen();
+
   });
 
 
@@ -282,8 +352,7 @@ function selectGroupScreen() {
         let playerName = $(this).data("playerName");
         toggleTeamState(playerName);
 
-      }
-    );
+      });
     }
   });
 
@@ -309,7 +378,7 @@ function selectGroupScreen() {
       G_myTeam.players.push(playerName);
     }
     //console.log('Team:');
-  //  console.log(G_myTeam);
+    //  console.log(G_myTeam);
   }
 
   $('#startBtn').click(function() {
@@ -361,7 +430,7 @@ function selectNextSport() {
     $(".startSportsListID").append(`
     <button id="${listItemID}" class="alaNapitGrid w3-button w3-green"> ${sportName} </button>
     `);
-    $(`#${listItemID}`).data("sportName",sportName);
+    $(`#${listItemID}`).data("sportName", sportName);
     $(`#${listItemID}`).click(function() {
       //  console.log("click");
       let sportName = $(this).data("sportName");
@@ -469,15 +538,15 @@ function gameScreen() {
     let par = sport.parList[G_myTeam.currentHole - 1];
     let parSum = sport.parList.reduce((total, num) => total + num, 0);
     let score = sportPlayer.scoreList[G_myTeam.currentHole - 1];
-    let totScore = player[sportName+"Score"];
+    let totScore = player[sportName + "Score"];
 
     $(".gameGrid").append(`
     <div class="playerNameColumn-item gameGrid-item"> ${playerName}</div>
     <div class="removeSwing gameGrid-item">
-      <button id="${removeBtn}" class="w3-btn w3-green plusMinuBtn"  > - </button> </div>
+      <button id="${removeBtn}" class="w3-large w3-btn w3-dark-grey w3-card-4 w3-circle plusMinuBtn"  > - </button> </div>
     <div id="${scoreID}" class="swingNr-item gameGrid-item"> ${score}  </div>
     <div class="addSwing-item gameGrid-item">
-      <button id="${addBtn}" class="w3-btn w3-green plusMinuBtn"> + </button> </div>
+      <button id="${addBtn}" class="w3-large w3-btn w3-dark-grey w3-circle w3-card-4 plusMinuBtn"> + </button> </div>
     <div id="${totScoreID}"  class="totalScore-item gameGrid-item"> ${totScore} </div>
     `);
 
@@ -507,7 +576,7 @@ function gameScreen() {
       let sportPlayer = $(this).data("sportPlayer");
       let player = $(this).data("player");
       if (sportPlayer.scoreList[G_myTeam.currentHole - 1] <= sport.maxScore[G_myTeam.currentHole - 1]) {
-        console.log("Scorelist of "+ sportPlayer.name + " aka "+player.name);
+        console.log("Scorelist of " + sportPlayer.name + " aka " + player.name);
         console.log(sportPlayer.scoreList);
         ++sportPlayer.scoreList[G_myTeam.currentHole - 1];
         console.log(sportPlayer.scoreList);
@@ -522,66 +591,77 @@ function gameScreen() {
 
 // Kokonaistilanne, lajikohtaiset tulokset, hakee muitten tulokset pilvestä
 function showResultTable() {
-
+  G_myTeam.players.length > 0 ? $('#NavBtnJatka').show() : $('#NavBtnJatka').hide();
   G_myTeam.status = "results";
-  let tableObjectArr = []; //Alustus, Datavektori bootstrap tablelle
+  let tableObjectArr = []; //Datavektori bootstrap tablelle
   let currentTableName = "Total";
   setLocaleStorage();
   $("#gameAppDiv").empty();
 
-  // Ylärivin valintanapit (muuttuva grid jako)
+  // Ylärivin valintanapit (muuttuva grid jako lajien määrän mukaan)
   $("#gameAppDiv").append(`
     <div id="selectResultTableDiv" class="resTableSelGrid">
       <button id="totalResultsBtn" class="w3-button w3-green resTableSelGrid-item w3-small">Kokonaistilanne</button>
     </div>`);
   $(`#totalResultsBtn`).click(() => {
-      showTable('Total');
-    });
+    showTable('Total');
+  });
   const sportsKeys = Object.keys(G_game.sports);
   $(".resTableSelGrid").css("grid-template-columns", `repeat(${sportsKeys.length+1}, 1fr)`);
   for (const sport of sportsKeys) {
     $("#selectResultTableDiv").append(`<button class="w3-button w3-green resTableSelGrid-item w3-small" id = "totalResultsBtn_${sport}" >${sport}</button>`);
     $(`#totalResultsBtn_${sport}`).click(() => {
       showTable(sport);
-      //console.log(sport);
     });
   }
 
   // pistetaulukko
-
   $("#gameAppDiv").append(`
-    <table id="resultTable" class="table-sm table_condensed" data-sortable="true" ></table>`);
+    <table id="resultTable" class="table-sm table_condensed" data-sortable="true" data-sort-name="position" ></table>`);
 
   // alanapit
-  $("#gameAppDiv").append(`<div id="alaNapitDiv" class="alaNapitGrid"></div>`);
-  $("#alaNapitDiv").append('<button id="updateBtn" class="w3-btn w3-green alaNapitGrid-item"> Päivitä </button>');
-  $("#alaNapitDiv").append('<div class="alaNapitGrid-item"> </div>');
-  $("#alaNapitDiv").append('<div class="alaNapitGrid-item"> </div>');
-  $("#alaNapitDiv").append('<button id="backBtn" class="w3-btn w3-green alaNapitGrid-item"> Takasin </button>');
-  $("#alaNapitDiv").append('<button id="continueBtn" class="w3-btn w3-green alaNapitGrid-item">Lopeta/Jatka</button>');
+  $("#gameAppDiv").append(`
+    <div id="alaNapitDiv" class="alaNapitGrid">
+      <button id="updateBtn" class="w3-btn w3-green alaNapitGrid-item"> Päivitä </button>
+      <div class="alaNapitGrid-item"> </div>
+      <div class="alaNapitGrid-item"> </div>
+      <button id="backBtn" class="w3-btn w3-green alaNapitGrid-item"> Takasin </button>
+      <button id="continueBtn" class="w3-btn w3-green alaNapitGrid-item">Lopeta ${G_myTeam.currentSport}</button>
+    </div>`);
 
-  $("#updateBtn").click( () => {
+  $("#updateBtn").click(() => {
     //console.log("UPDATE");
     new Promise((resolve, reject) => updateGameDataFromCloud(resolve, reject))
-    .then( () => updateRanking() )
-    .then(()=>formTableData())
-    .then(()=>showTable())
-    .catch(console.log("Error in updateGameDataFromCloud() when Päivitysnappi was pushed"));
+      .then(() => updateRanking())
+      .then(() => formTableData())
+      .then(() => showTable())
+      .catch(console.log("Error in updateGameDataFromCloud() when Päivitysnappi was pushed"));
   });
-  $("#backBtn").click( () => gameScreen());
-  $("#continueBtn").click( () => {
-    G_myTeam = new MyTeam;
-    setLocaleStorage();
-    //loadFirebaseInitialData();
-    startScreen();
-  });
+  console.log(G_myTeam.players.length > 0);
+  if (G_myTeam.players.length == 0) {
+    $("#backBtn").hide();
+    $("#continueBtn").hide();
+  } else {
+    $("#backBtn").click(() => gameScreen());
+    $("#continueBtn").click(() => {
+      console.log();
+      G_game.sports[G_myTeam.currentSport].status = "finished";
+      G_myTeam = new MyTeam;
+      setLocaleStorage();
+      //loadFirebaseInitialData();
+      G_database = new Database;
+      loadFirebaseInitialData()
+      //startScreen();
+    });
+  }
+
 
   // Hae data pilvestä ja päitiä taulukko vasta sitten
   new Promise((resolve, reject) => updateGameDataFromCloud(resolve, reject))
-  .then( () => updateRanking() )
-  .then( () => formTableData() )
-  .then( () => showTable() )
-  .catch( () => console.log("Error in updateGameDataFromCloud when loading showResultTable()") );
+    .then(() => updateRanking())
+    .then(() => formTableData())
+    .then(() => showTable())
+    .catch(() => console.log("Error in updateGameDataFromCloud when loading showResultTable()"));
 
 
   function updateRanking() {
@@ -592,37 +672,39 @@ function showResultTable() {
     let totalRanking = [];
 
     // PLayers to array
-    Object.keys(G_game.players).forEach((playerName,ind,arr) => {
+    Object.keys(G_game.players).forEach((playerName, ind, arr) => {
       playersArr.push(G_game.players[playerName]); //ARRAY OF REFS
 
     });
     console.log(G_game.players);
     // PLayer sport positions
-    Object.keys(G_game.sports).forEach((sportName,ind,arr) => {
+    Object.keys(G_game.sports).forEach((sportName, ind, arr) => {
 
       //playersArr.sort(function(a, b) {
       //  return a[sportName+'Score'] - b[sportName+'Score'];
       //});
 
       //    let scoreArrays = [];
-      let maxScore = Math.max.apply( Math, playersArr.map( obj => { return obj[sportName+'Score']}) );
+      let maxScore = Math.max.apply(Math, playersArr.map(obj => {
+        return obj[sportName + 'Score']
+      }));
       // Lajitellaan pelaajaobjektit scoren mukaisesti ryhmiin
       let scoreArrays = []; //Array of Arrays of Objects
-      for (var i = 0; i <= maxScore+100; i++) {
+      for (var i = 0; i <= maxScore + 100; i++) {
         scoreArrays[i] = [];
       };
-      playersArr.forEach( (player,ind) => {
-        scoreArrays[player[sportName+'Score']+100].push(player);
+      playersArr.forEach((player, ind) => {
+        scoreArrays[player[sportName + 'Score'] + 100].push(player);
       });
       // POISTA TYHJÄT
-      scoreArrays = scoreArrays.filter( (el) => {
+      scoreArrays = scoreArrays.filter((el) => {
         return el.length > 0;
       });
       let nextPosition = 0;
-      scoreArrays.forEach( (scoreArr,ind) => {
-        scoreArr.forEach((player,index)=>{
+      scoreArrays.forEach((scoreArr, ind) => {
+        scoreArr.forEach((player, index) => {
           let pos = nextPosition;
-          player[sportName+'Position'] = nextPosition +1;
+          player[sportName + 'Position'] = nextPosition + 1;
           player.setPoints();
         })
         nextPosition += scoreArr.length; //0 0 1 1 0
@@ -633,26 +715,28 @@ function showResultTable() {
 
     //  TOTAL POSITIONIN LASKENTA
     let pointsArrays = []; //Array of Arrays of Objects
-    let maxPoints = Math.max.apply( Math, playersArr.map( obj => { return obj.pointsTot } ) );
+    let maxPoints = Math.max.apply(Math, playersArr.map(obj => {
+      return obj.pointsTot
+    }));
 
     for (var i = 0; i <= maxPoints; i++) {
       pointsArrays[i] = [];
     };
-    playersArr.forEach( (player,ind) => {
+    playersArr.forEach((player, ind) => {
       pointsArrays[player.pointsTot].push(player);
     });
-    pointsArrays = pointsArrays.filter( (el) => {
+    pointsArrays = pointsArrays.filter((el) => {
       return el.length > 0;
     });
     let nextPosition = 0;
     let index_reversed = 0;
 
-    for (var i = pointsArrays.length-1; i >= 0 ; i--) {
+    for (var i = pointsArrays.length - 1; i >= 0; i--) {
       pointArr = pointsArrays[i];
-      pointArr.forEach((player,index)=>{
+      pointArr.forEach((player, index) => {
         player.position = nextPosition + index_reversed + 1;
       })
-      nextPosition = pointArr.length-1;
+      nextPosition = pointArr.length - 1;
       index_reversed++;
     }
   }
@@ -660,13 +744,13 @@ function showResultTable() {
 
   function formTableData() {
     console.log("formTableData()");
-    tableObjectArr  = []; //Alustus, Data vektori bootstrap tablelle
+    tableObjectArr = []; //Alustus, Data vektori bootstrap tablelle
     //let sportPlayers = G_game.sports[G_myTeam.currentSport].players; //REF
     let tableObject = new Object;
     let tableColumns = [];
 
     // Poimi pelaajadata
-    Object.keys(G_game.players).forEach((playerName, index, array)=> {
+    Object.keys(G_game.players).forEach((playerName, index, array) => {
       let tableObject = new Object;
       tableObject.name = playerName;
       tableObject.pointsTot = G_game.players[playerName].pointsTot;
@@ -675,60 +759,94 @@ function showResultTable() {
       // Poimi Tulosdata
       Object.keys(G_game.sports).forEach((sportName, ind2, arr2) => {
         tableObject[sportName] = {};
-        tableObject[sportName+'Points'] = G_game.players[playerName][sportName+'Points'];
-        tableObject[sportName+'Score'] = G_game.players[playerName][sportName+'Score'];
-        tableObject[sportName+'Position'] = G_game.players[playerName][sportName+'Position'];
+        tableObject[sportName + 'Points'] = G_game.players[playerName][sportName + 'Points'];
+        tableObject[sportName + 'Score'] = G_game.players[playerName][sportName + 'Score'];
+        tableObject[sportName + 'Position'] = G_game.players[playerName][sportName + 'Position'];
         //scorelist to object
         const sportScoreList = G_game.sports[sportName].players[playerName].scoreList;
 
-      //  console.log(playerName);
-      //  console.log(G_game.sports[sportName].players[playerName]);
+        //  console.log(playerName);
+        //  console.log(G_game.sports[sportName].players[playerName]);
         tableObject[sportName].scorelist = {};
         for (var i = 0; i < sportScoreList.length; i++) {
           tableObject[sportName].scorelist[i] = sportScoreList[i];
         }
       })
       tableObjectArr.push(tableObject);
-      })
+    })
     // console.log('tableObjectArr');
     // console.log(tableObjectArr);
-      return tableObjectArr;
+    return tableObjectArr;
 
-    }
+  }
 
-  function showTable(tableName=currentTableName) {
+  function showTable(tableName = currentTableName) {
     console.log("showTable()");
     currentTableName = tableName;
 
     tableColumns = [];
 
     if (tableName == "Total") {
-      tableColumns.push({field: 'position',title: '',sortable: true});
-      tableColumns.push({field: 'name',title: 'Pelaaja'});
-      tableColumns.push({field: 'pointsTot',title: 'Pts.'});
-      // Laji scoret ja pisteet
-      Object.keys(G_game.sports).forEach((sportName, index, array)=>{
-        //console.log(sportName);
-        tableColumns.push({field: `${sportName}Position` ,title: `${sportName} sij.`,sortable: true});
-        //tableColumns.push({field: `${sportName}Score` ,title: `${sportName} +/-`,sortable: true});
-        tableColumns.push({field: `${sportName}Points` ,title: `${sportName} p.`,sortable: true});
+      tableColumns.push({
+        field: 'position',
+        title: '',
+        sortable: true
       });
-    }
-    else {
+      tableColumns.push({
+        field: 'name',
+        title: 'Pelaaja'
+      });
+      tableColumns.push({
+        field: 'pointsTot',
+        title: 'Pts.'
+      });
+      // Laji scoret ja pisteet
+      Object.keys(G_game.sports).forEach((sportName, index, array) => {
+        //console.log(sportName);
+        tableColumns.push({
+          field: `${sportName}Position`,
+          title: `${sportName} sij.`,
+          sortable: true
+        });
+        //tableColumns.push({field: `${sportName}Score` ,title: `${sportName} +/-`,sortable: true});
+        tableColumns.push({
+          field: `${sportName}Points`,
+          title: `${sportName} p.`,
+          sortable: true
+        });
+      });
+    } else {
       // Yhden lajin scoret ja pisteet ja väylätulokset
       let sportName = tableName;
-      tableColumns.push({field: `${sportName}Position` ,title: `${sportName} sij.`,sortable: true});
-      tableColumns.push({field: 'name',title: 'Pelaaja'});
-      tableColumns.push({field: sportName+'Points',title: 'p'});
-
-      Object.keys(tableObjectArr[0][sportName].scorelist).forEach((element, index, array)=>{
-        tableColumns.push({field: `${sportName}.scorelist.${index}` ,title: index+1});
+      tableColumns.push({
+        field: `${sportName}Position`,
+        title: `${sportName} sij.`,
+        sortable: true
       });
-      tableColumns.push({field: sportName+'Score',title: '+/-',sortable: true});
+      tableColumns.push({
+        field: 'name',
+        title: 'Pelaaja'
+      });
+      tableColumns.push({
+        field: sportName + 'Points',
+        title: 'p'
+      });
+
+      Object.keys(tableObjectArr[0][sportName].scorelist).forEach((element, index, array) => {
+        tableColumns.push({
+          field: `${sportName}.scorelist.${index}`,
+          title: index + 1
+        });
+      });
+      tableColumns.push({
+        field: sportName + 'Score',
+        title: '+/-',
+        sortable: true
+      });
     }
 
     //console.log("tableColumns:");
-  //  console.log(tableColumns);
+    //  console.log(tableColumns);
     $('#resultTable').bootstrapTable('destroy');
     $('#resultTable').bootstrapTable({
       columns: tableColumns,
@@ -740,14 +858,42 @@ function showResultTable() {
 
 function settingsScreen() {
   console.log("Näytöllä: settingsScreen ");
-  $('#NavBtnHome').show();
-  $('#NavBtnSettings').hide();
+  console.log(G_game.maxStrokes);
+  G_myTeam.players.length > 0 ? $('#NavBtnJatka').show() : $('#NavBtnJatka').hide();
+
 
   $("#gameAppDiv").empty();
+  $("#infoDiv").hide();
   //Main elements
   $("#gameAppDiv").append(`
-    <div class="w3-container>
-
+    <div class="w3-container">
+      <h6> Max. tulos + <input id="maxStrokesID" class="" type="number" value="${G_game.maxStrokes}"></input></h6>
+      <h6> Pistejako:</h6>
+      <ol>
+        <li><input id="points1" value="14" class="" type="number"></input></li>
+        <li><input id="points2" value="12"class="" type="number"></input></li>
+        <li><input id="points3" value="10"class="" type="number"></input></li>
+        <li> <input id="points4" value="9"class="" type="number"></input></li>
+        <li><input id="points5" value="8"class="" type="number"></input></li>
+        <li><input id="points6" value="7" class="" type="number"></input></li>
+        <li><input id="points7" value="6"class="" type="number"></input></li>
+        <li> <input id="points8" value="5" class="" type="number"></input></li>
+        <li> <input id="points9" value="4" class="" type="number"></input></li>
+        <li> <input id="points10" value="3" class="" type="number"></input></li>
+        <li> <input id="points11" value="2" class="" type="number"></input></li>
+        <li> <input id="points12" value="1" class="" type="number" value></input></li>
+      </ol>
     </div>
     `);
+  $("#maxStrokesID").change( () => {
+    num = parseInt($("#maxStrokesID").val(), 10);
+    G_game.maxStrokes =num;
+    if (Object.keys(G_game.sports).length > 0) {
+      Object.keys(G_game.sports).forEach((sportName) => {
+        G_game.sports[sportName].setMaxScore();
+        console.log("tähän");
+        console.log(sportName);
+      })
+    }
+  })
 }

@@ -1,4 +1,4 @@
-// Initialize Firebase 
+// Initialize Firebase
 
 //Järjestys:
 // create Empty G_game & G_database & G_myTeam->
@@ -7,7 +7,7 @@
 //loadFirebaseInitialData -> (Load G_database from cloud)
 //initGame -> (update G_game from G_database and select UI to show based on G_myTeam.status)
 
-
+//Firebase config
 let config = {
   apiKey: "AIzaSyAEaRb-PxgqlQKR3w94m60SahLZW8Y5CUo",
   authDomain: "triplagolf.firebaseapp.com",
@@ -22,6 +22,13 @@ const firestore = firebase.firestore();
 const settings = {/* your settings... */ timestampsInSnapshots: true};
 firestore.settings(settings);
 
+window.onload = function() {
+ initApp();
+};
+//window.onpagehide = function() {
+  //setLocaleStorage();
+//};
+
 //Google sign in/out
 function toggleSignIn() {
   if (!firebase.auth().currentUser) {
@@ -34,7 +41,6 @@ function toggleSignIn() {
   document.getElementById('quickstart-sign-in').disabled = true;
   document.getElementById('quickstart-sign-out').disabled = true;
 }
-
 function initApp() {
   firebase.auth().getRedirectResult().then(function(result) {
     console.log("logging in");
@@ -82,13 +88,6 @@ function initApp() {
 
 }
 
-window.onload = function() {
- initApp();
-};
-
-window.onpagehide = function() {
-  //setLocaleStorage();
-};
 
 //cloud REFS:
 let collectionRefGames = firestore.collection("games");
@@ -100,6 +99,7 @@ let G_game = new Game("empty"); //Yksi ladattu peli, päivitys pilveen/pilvestä
 let G_myTeam = new MyTeam; //Pidetään kirjaa ketä on tässä pelissä mukana (vektori pelaajien nimistä)
 
 let G_points = [14, 12, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
+let G_maxStrokes = 7;
 
 // Hakee G_myTeamin localesta, alustaa G_gamen pelaaja ja laji objekteilla, muu data haetaan pilvestä
 // Kutsuu loadFirebaseInitialData:a kun valmis
@@ -210,8 +210,6 @@ function initGame() {
   }
 }
 
-
-
 // MUUTA ETTEI HÄVITÄ METHODEJA
 function updateGameDataFromCloud(resolve, reject) {
   console.log("updating " + G_game.name + " from cloud");
@@ -240,8 +238,7 @@ function updateGameDataFromDatabase(resolve, reject) {
 
   if (fetchedGameData) {
     setGameData(fetchedGameData);
-    resolve("VALMIS");
-    console.log(G_game);
+    resolve("OK!");
   }
   else {
     reject("ERROR");
@@ -252,8 +249,6 @@ function updateGameDataFromDatabase(resolve, reject) {
 function setGameData(fetchedGameData){
   console.log("setGameData()");
 
-  //OK
-  //console.log(G_game.players);
   Object.keys(fetchedGameData.players).forEach( (playerName,ind,arr) => {
     G_game.players[playerName] = new Player(playerName);
     let tempObj = JSON.parse( JSON.stringify(fetchedGameData.players[playerName]) );
@@ -296,7 +291,7 @@ function saveGame2cloud(resolve, reject) {
   }
   console.log(G_game);
   var gameDataStr = JSON.stringify(G_game);
-  var gameData = JSON.parse(gameDataStr);
+  var gameData = JSON.parse(gameDataStr); //G_game:n Muunnos objektiksi ilman methodeja
   var gameDoc = G_game.name;
   console.log("gameData about to be saved to cloud:");
   console.log(gameData);
@@ -319,6 +314,9 @@ function savePlayer2cloud(player) {
   firestore.collection('players').doc(playerDoc).set(playerData);
 }
 
+
+
+//EI KÄYTÖSSÄ!
 function deleteLocaleStorage() {
   console.log('deleteLocaleStorage()');
   if (typeof(localStorage) !== "undefined") {
@@ -348,23 +346,4 @@ function removePlayer(player) {
      saveGame2cloud();
   }
   return r;
-} //EI KÄYTÖSSÄ!
-
-
-
-// Lätkäse teksti ruutuun kaikille jos tulee birdie /holari
-function golfScore(par, strokes) {
-  var names = ["Hole-in-one!", "Eagle", "Birdie", "Par", "Bogey", "Double Bogey", "Go Home!"];
-  if (strokes==1) {
-    return names[0]
-  } else if(strokes-par < -2){
-      return names[1];
-  } else if(strokes-par > 3){
-      return names[6];
-  } else {
-    return names[strokes-par+3];
-  }
-
-
-  // Only change code above this line
 }
