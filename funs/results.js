@@ -180,12 +180,13 @@ function showResultTable() {
       tableObject.name = playerName;
       tableObject.pointsTot = playerObj.pointsTot;
       tableObject.position = playerObj.position;
-      tableObject.currentHole =playerObj[G_game.currentSport+'CurrentHole']
+
       // Poimi Tulosdata
       Object.keys(G_game.sports).forEach((sportName, ind2, arr2) => {
         tableObject[sportName] = {};
         // Aseta viivat pisteiden tilalle jos lajia ei ole aloitettu
-
+        tableObject[sportName+'CurrentHole'] =playerObj[sportName+'CurrentHole'];
+        console.log(tableObject);
         // console.log("G_game.sports["+sportName+"].status: " + G_game.sports[sportName].status);
 
         //Korjaa pistemäärä?
@@ -204,7 +205,7 @@ function showResultTable() {
 
         tableObject[sportName].scorelist = {};
         //for (var i = 0; i < sportScoreList.length; i++) {
-        for (var i = 0; i < tableObject.currentHole; i++) {
+        for (var i = 0; i <tableObject[sportName+'CurrentHole']-1; i++) {
           tableObject[sportName].scorelist[i] = sportScoreList[i];
         }
       })
@@ -265,8 +266,8 @@ function showResultTable() {
         title: 'Pelaaja'
       });
       tableColumns.push({
-        field: 'currentHole',
-        title: 'ON HOLE',
+        field: `${sportName}CurrentHole`,
+        title: 'Väylällä',
         class: 'currentHoleCol',
         width: "25"
 
