@@ -269,3 +269,13 @@ ol {
   width: 200px;
 
 }
+
+/* Resultstable */
+.currentHoleCol {
+  font-weight: bold;
+
+}
+
+.sijoitusCol {
+  font-weight: bold;
+}

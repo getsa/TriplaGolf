@@ -414,6 +414,7 @@ function selectNextSport() {
       //  console.log("click");
       let sportName = $(this).data("sportName");
       G_myTeam.currentSport = sportName;
+      G_game.currentSport = sportName;
       G_myTeam.status = "sportOn";
       //
       G_game.status = "gameOn";
@@ -432,6 +433,8 @@ function gameScreen() {
   $('#NavBtnHome').show();
   $('#NavBtnResults').show();
   $('#NavBtnJatka').hide();
+
+  G_myTeam.status = "sportOn";
 
   console.log("gameScreen() - G_game:");
   console.log(G_game);
@@ -470,26 +473,24 @@ function gameScreen() {
   if (G_myTeam.currentHole == sport.parNr) {
     $('#finishSportButton').show();
   }
+  else {
+    $('#finishSportButton').hide();
+  }
 
   $(`#holeButtonPrev`).click(() => {
     (G_myTeam.currentHole > 1) && G_myTeam.currentHole--;
     $('#holeNrID').text(G_myTeam.currentHole);
     $('#parID').text(sport.parList[G_myTeam.currentHole - 1]);
     // Scoren päivitys
-    console.log(sport);
     Object.keys(G_myTeam.players).forEach(function(key, index) {
       let playerName = G_myTeam.players[key];
       let scoreID = `score_${playerName}`;
-      $(`#${scoreID}`).text(G_game.sports[sportName].players[playerName].scoreList[G_myTeam.currentHole - 1]); // Henk. koht. pistemäärä
+      $(`#${scoreID}`).text(G_game.sports[sportName].players[playerName].scoreList[G_myTeam.currentHole - 1]); // Henk. koht. pistemäärä näytölle
       G_game.players[playerName][sportName+'CurrentHole'] = G_myTeam.currentHole; // Henk. koht. tämänhetkinen reikä
-      console.log("Cur hole: "+G_myTeam.currentHole);
-      console.log(G_game.players[playerName]);
     });
 
-
-
-    $('#finishSportButton').hide();
     setLocaleStorage();
+    saveGame2cloud();
   });
 
   $(`#holeButtonNext`).click(() => {
@@ -497,15 +498,17 @@ function gameScreen() {
     $('#holeNrID').text(G_myTeam.currentHole);
     $('#parID').text(sport.parList[G_myTeam.currentHole - 1]);
 
-    Object.keys(G_myTeam.players).forEach(function(playerName, index) {
-      let scoreID = `score_${G_myTeam.players[playerName]}`;
-      $(`#${scoreID}`).text(G_myTeam.players[playerName].scoreList[G_myTeam.currentHole - 1]); // Henk. koht. pistemäärä
-      G_game.players[playerName][sportName+'currentHole'] = G_myTeam.currentHole; // Henk. koht. tämänhetkinen reikä
+    Object.keys(G_myTeam.players).forEach(function(key, index) {
+      let playerName = G_myTeam.players[key];
+      let scoreID = `score_${playerName}`;
+      $(`#${scoreID}`).text(G_game.sports[sportName].players[playerName].scoreList[G_myTeam.currentHole - 1]); // Henk. koht. pistemäärä näytölle
+      G_game.players[playerName][sportName+'CurrentHole'] = G_myTeam.currentHole; // Henk. koht. tämänhetkinen reikä
     });
 
     if (G_myTeam.currentHole == sport.parNr) {
       $('#finishSportButton').show();
     }
+    $('#finishSportButton').hide();
 
     setLocaleStorage();
     saveGame2cloud();

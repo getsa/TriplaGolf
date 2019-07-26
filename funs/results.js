@@ -87,41 +87,51 @@ function showResultTable() {
     // PLayers to array
     Object.keys(G_game.players).forEach((playerName, ind, arr) => {
       playersArr.push(G_game.players[playerName]); //ARRAY OF REFS
-
     });
   //  console.log(G_game.players);
     // PLayer sport positions
     Object.keys(G_game.sports).forEach((sportName, ind, arr) => {
 
-      //playersArr.sort(function(a, b) {
-      //  return a[sportName+'Score'] - b[sportName+'Score'];
-      //});
+      //Laske vain jos laji alkanut!, muuten nolla kaikille
+      if (G_game.sports[sportName].status == 'notStarted') {
+        playersArr.forEach((player, ind) => {
+          console.log(player);
+          G_game.players[player.name][sportName + 'Points'] = 0;
+        });
+      }
+      else {
+        // Ryhmitellään pelaajat pisteiden 2dim vektoriin:
+        // [ [Jussi],
+        // [Keijo, Jorma],
+        // [],
+        //[Sami] ]
 
-      //    let scoreArrays = [];
-      let maxScore = Math.max.apply(Math, playersArr.map(obj => {
-        return obj[sportName + 'Score']
-      }));
-      // Lajitellaan pelaajaobjektit scoren mukaisesti ryhmiin
-      let scoreArrays = []; //Array of Arrays of Objects
-      for (var i = 0; i <= maxScore + 100; i++) {
-        scoreArrays[i] = [];
-      };
-      playersArr.forEach((player, ind) => {
-        scoreArrays[player[sportName + 'Score'] + 100].push(player);
-      });
-      // POISTA TYHJÄT
-      scoreArrays = scoreArrays.filter((el) => {
-        return el.length > 0;
-      });
-      let nextPosition = 0;
-      scoreArrays.forEach((scoreArr, ind) => {
-        scoreArr.forEach((player, index) => {
-          let pos = nextPosition;
-          player[sportName + 'Position'] = nextPosition + 1;
-          player.setPoints();
-        })
-        nextPosition += scoreArr.length; //0 0 1 1 0
-      });
+        // Luodaan riittävän iso tyhjä vektori
+        let maxScore = Math.max.apply(Math, playersArr.map(obj => {
+          return obj[sportName + 'Score']
+        }));
+        let scoreArrays = []; //Array of Arrays of Objects
+        for (var i = 0; i <= maxScore + 100; i++) {
+          scoreArrays[i] = [];
+        };
+        //Lajitellaan pelaajat
+        playersArr.forEach((player, ind) => {
+          scoreArrays[player[sportName + 'Score'] + 100].push(player);
+        });
+        // Poistetaan tyhjät rivit
+        scoreArrays = scoreArrays.filter((el) => {
+          return el.length > 0;
+        });
+        let nextPosition = 0;
+        scoreArrays.forEach((scoreArr, ind) => {
+          scoreArr.forEach((player, index) => {
+            let pos = nextPosition;
+            player[sportName + 'Position'] = nextPosition + 1;
+            player.setPoints();
+          })
+          nextPosition += scoreArr.length; //0 0 1 1 0
+        });
+      }
     });
 
 
@@ -162,21 +172,23 @@ function showResultTable() {
     let tableObject = new Object;
     let tableColumns = [];
 
+
     // Poimi pelaajadata
     Object.keys(G_game.players).forEach((playerName, index, array) => {
+      let playerObj = G_game.players[playerName];
       let tableObject = new Object;
       tableObject.name = playerName;
-      tableObject.pointsTot = G_game.players[playerName].pointsTot;
-      tableObject.position = G_game.players[playerName].position;
-
+      tableObject.pointsTot = playerObj.pointsTot;
+      tableObject.position = playerObj.position;
+      tableObject.currentHole =playerObj[G_game.currentSport+'CurrentHole']
       // Poimi Tulosdata
       Object.keys(G_game.sports).forEach((sportName, ind2, arr2) => {
         tableObject[sportName] = {};
         // Aseta viivat pisteiden tilalle jos lajia ei ole aloitettu
 
-        console.log("G_game.sports["+sportName+"].status: " + G_game.sports[sportName].status);
+        // console.log("G_game.sports["+sportName+"].status: " + G_game.sports[sportName].status);
 
-        //Korjaa?
+        //Korjaa pistemäärä?
         if  (G_game.sports[sportName].status == "notStarted") {
           tableObject[sportName + 'Points'] = "-";
           tableObject[sportName + 'Score'] = "-";
@@ -204,7 +216,7 @@ function showResultTable() {
   }
 
   function showTable(tableName = currentTableName) {
-    console.log("showTable()");
+    console.log("showTable("+tableName+")");
     currentTableName = tableName;
 
     tableColumns = [];
@@ -213,7 +225,8 @@ function showResultTable() {
       tableColumns.push({
         field: 'position',
         title: '',
-        sortable: true
+        sortable: true,
+        class: 'sijoitusCol'
       });
       tableColumns.push({
         field: 'name',
@@ -221,7 +234,7 @@ function showResultTable() {
       });
       tableColumns.push({
         field: 'pointsTot',
-        title: 'Pts.'
+        title: 'Kokonaispisteet'
       });
       // Laji scoret ja pisteet
       Object.keys(G_game.sports).forEach((sportName, index, array) => {
@@ -243,7 +256,7 @@ function showResultTable() {
       let sportName = tableName;
       tableColumns.push({
         field: `${sportName}Position`,
-        title: `${sportName} sij.`,
+        title: ``,
         sortable: true
       });
       tableColumns.push({
@@ -251,9 +264,13 @@ function showResultTable() {
         title: 'Pelaaja'
       });
       tableColumns.push({
-        field: sportName + 'Points',
-        title: 'p'
+        field: 'currentHole',
+        title: 'ON HOLE',
+        class: 'currentHoleCol',
+        width: "25"
+
       });
+
 
       Object.keys(tableObjectArr[0][sportName].scorelist).forEach((element, index, array) => {
         tableColumns.push({

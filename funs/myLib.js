@@ -39,15 +39,19 @@ function Player(name) {
 	this.setPoints = function() {
 		this.pointsTot = 0;
 		Object.keys(G_game.sports).forEach((sportName,ind,arr)=>{
-			if(this[sportName + 'Position'] > G_points.length) {
-				this[sportName + 'Points'] = G_points[G_points.length-1];
-				this.pointsTot +=  this[sportName + 'Points'];
-			}
-			else {
-				this[sportName + 'Points'] = G_points[this[sportName + 'Position']];
-				this.pointsTot +=  this[sportName + 'Points'];
-			}
+      if (G_game.sports[sportName].status == 'notStarted') {
 
+      }
+      else {
+  			if(this[sportName + 'Position'] > G_points.length) {
+  				this[sportName + 'Points'] = G_points[G_points.length-1];
+  				this.pointsTot +=  this[sportName + 'Points'];
+  			}
+  			else {
+  				this[sportName + 'Points'] = G_points[this[sportName + 'Position']];
+  				this.pointsTot +=  this[sportName + 'Points'];
+  			}
+      }
 		}, this) // HUOM! Thissin käyttö
 
 	}

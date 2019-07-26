@@ -63,7 +63,7 @@ function initApp() {
   firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
       // User is signed in.
-      console.log(user);
+      //console.log(user);
       var displayName = user.displayName;
       var email = user.email;
       console.log('user: '+email+" signed in");
@@ -199,7 +199,7 @@ function loadFirebaseInitialData() {
 function initGame() {
   console.log('initGame()');
   console.log(G_myTeam);
-  //console.log("G_myTeam.status: " + G_myTeam.status);
+  console.log("G_myTeam.status: " + G_myTeam.status);
   if (G_myTeam.status=="empty") {
 
     let G_game = new Game("empty");
@@ -264,6 +264,11 @@ function updateGameDataFromDatabase(resolve, reject) {
 //Apufunktio - luo pelaaja ja sport objektit ja hakee datan sourcesta
 function setGameData(fetchedGameData){
   console.log("setGameData()");
+
+  G_game.status = fetchedGameData.status;
+  G_game.name = fetchedGameData.name;
+  G_game.maxStrokes = fetchedGameData.maxStrokes;
+  G_game.currentSport = fetchedGameData.currentSport;
 
   Object.keys(fetchedGameData.players).forEach( (playerName,ind,arr) => {
     G_game.players[playerName] = new Player(playerName);
