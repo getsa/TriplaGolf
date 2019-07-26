@@ -63,7 +63,7 @@ function initApp() {
   firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
       // User is signed in.
-
+      console.log(user);
       var displayName = user.displayName;
       var email = user.email;
       console.log('user: '+email+" signed in");
@@ -73,6 +73,20 @@ function initApp() {
       showNavBar();
       getLocaleStorage();
       document.getElementById('quickstart-sign-out').disabled = false;
+      // Save login to info to cloud
+      firestore.collection("logins").doc(uid).set({
+      displayName: displayName,
+      email: email,
+      photoURL: photoURL
+      })
+      .then(function() {
+          console.log("Document successfully written!");
+      })
+      .catch(function(error) {
+          console.error("Error writing document: ", error);
+      });
+
+
     } else {
       // User is signed out.
       console.log('user signed out');
@@ -93,6 +107,7 @@ function initApp() {
 let collectionRefGames = firestore.collection("games");
 let collectionRefPlayers = firestore.collection("players");
 let collectionRefSports = firestore.collection("sports");
+let collectionRefLogins = firestore.collection("logins");
 
 let G_database = new Database; //Kaikki data kaikista peleistä ja pelaajista
 let G_game = new Game("empty"); //Yksi ladattu peli, päivitys pilveen/pilvestä
@@ -210,7 +225,7 @@ function initGame() {
   }
 }
 
-// MUUTA ETTEI HÄVITÄ METHODEJA
+// MUUTA ETTEI HÄVITÄ METHODEJA?
 function updateGameDataFromCloud(resolve, reject) {
   console.log("updating " + G_game.name + " from cloud");
   //console.log(G_game);
@@ -231,6 +246,7 @@ function updateGameDataFromCloud(resolve, reject) {
 }
 
 // Asettaa alkulatauksessa G_gamen datan G_databasesta.
+// Eli luo objektit ja päivittää niihin pilvestä haetut datat
 //   OK
 function updateGameDataFromDatabase(resolve, reject) {
   console.log("updateGameDataFromDatabase()");
@@ -263,7 +279,8 @@ function setGameData(fetchedGameData){
     G_game.sports[sportName].parList = [...tempObj.parList];
     G_game.sports[sportName].parNr = tempObj.parNr;
     G_game.sports[sportName].totalPar = tempObj.totalPar;
-
+    G_game.sports[sportName].status = tempObj.status;
+    G_game.sports[sportName].maxSetting = tempObj.maxSetting;
     Object.keys(fetchedGameData.players).forEach( (playerName,ind,arr) => {
       G_game.sports[sportName].players[playerName] = new Player(playerName);
       G_game.players[playerName].addSportPoints(sportName);
@@ -275,6 +292,7 @@ function setGameData(fetchedGameData){
       G_game.players[playerName][sportName+'Score'] = tempObjPlayer[sportName+'Score'];
       G_game.players[playerName][sportName+'Position'] = tempObjPlayer[sportName+'Position'];
       G_game.sports[sportName].players[playerName].scoreList = tempObjSportPlayer.scoreList;
+      G_game.players[playerName][sportName+'CurrentHole'] = tempObjPlayer[sportName+'CurrentHole'];
     })
   })
 }

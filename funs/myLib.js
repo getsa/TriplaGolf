@@ -29,6 +29,7 @@ function Player(name) {
 		this[sportName + 'Points'] = 0;
 		this[sportName + 'Score'] = 0;
 		this[sportName + 'Position'] = 0;
+    this[sportName + 'CurrentHole'] = 0; //Tulostaulukkoa varten
 	}
 
 	this.addSportResults = function(sportObj) {
@@ -67,16 +68,17 @@ class MyTeam {
 class Sport {
   constructor(sportName,parNr=0,parList=[0]) {
     this.name = sportName;
-    this.status = "empty"; //"empty", "gameOn", "finished"
+    this.status = "notStarted"; //"notStarted", "gameOn", "finished"
     this.parNr = parNr; //Reikien määrä
     this.parList = parList; //par-vektori
-    this.maxScore = parList.map(x => x + G_game.maxStrokes); //Maksimilyönnit (vektori)
+    this.maxSetting = G_maxStrokes;
+    this.maxScore = parList.map(x => x + G_maxStrokes); //Maksimilyönnit (vektori)
     this.players = {};
     this.totalPar = [...parList].reduce( (a,b) => a+b ,0); //Ihannetulos
   }
   setMaxScore() {
     this.maxScore = this.parList.map(x => x + G_game.maxStrokes);
-    console.log("new maxScore:");
+    console.log("new maxScores:");
     console.log(this.maxScore);
   }
 }
