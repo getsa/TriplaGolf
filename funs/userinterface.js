@@ -104,33 +104,43 @@ function startScreen() {
       </div>
       `);
     //console.log(G_database);
+    if (G_database.games.length==0) {
+      $("#gameAppDiv").append(`
+        <div class="w3-container">
+          <p> Ei pelejä menossa </p>
 
-    //Listataan keskeneräiset pelit
-    G_database.games.forEach((game, i) => {
-      $("#gameListID").show();
-      if (game.status == "gameOn") {
-        $("#ContinueGameTag").show();
+        </div>
+        `);
+    }
+    else {
+      //Listataan keskeneräiset pelit
+      G_database.games.forEach((game, i) => {
+        $("#gameListID").show();
+        if (game.status == "gameOn") {
+          $("#ContinueGameTag").show();
 
-        let gamesListItemID = `${game.name}_gamesListItemID`;
-        gamesListItemID = gamesListItemID.replace(/\s+/g, '');
-        $("#gameListID").append(`
-          <button id="${gamesListItemID}" class="w3-btn w3-amber listaGrid-item" >${game.name}</button><p/>
-          `);
-        $(`#${gamesListItemID}`).data("gameobj", game);
+          let gamesListItemID = `${game.name}_gamesListItemID`;
+          gamesListItemID = gamesListItemID.replace(/\s+/g, '');
+          $("#gameListID").append(`
+            <button id="${gamesListItemID}" class="w3-btn w3-amber listaGrid-item" >${game.name}</button><p/>
+            `);
+          $(`#${gamesListItemID}`).data("gameobj", game);
 
-        //Valitaan vanha peli:
-        $(`#${gamesListItemID}`).click(function() {
-          let game_obj = $(this).data("gameobj");
-          Object.assign(G_game, game_obj);
-          G_myTeam.gameName = G_game.name;
-          G_myTeam.players = [];
-          chooseResContSet(showResults);
-          //selectGroupScreen();
-          //$('#NavBtnResults').show();
-        });
-      }
-    });
+          //Valitaan vanha peli:
+          $(`#${gamesListItemID}`).click(function() {
+            let game_obj = $(this).data("gameobj");
+            Object.assign(G_game, game_obj);
+            G_myTeam.gameName = G_game.name;
+            G_myTeam.players = [];
+            chooseResContSet(showResults);
+            //selectGroupScreen();
+            //$('#NavBtnResults').show();
+          });
+        }
+      });
+    }
   }
+
   // Listaa vanhat loppuun pelatut pelit
   function showFinishedGamesScreen() {
     console.log(G_database);
@@ -508,7 +518,7 @@ function gameScreen() {
     if (G_myTeam.currentHole == sport.parNr) {
       $('#finishSportButton').show();
     }
-    $('#finishSportButton').hide();
+
 
     setLocaleStorage();
     saveGame2cloud();

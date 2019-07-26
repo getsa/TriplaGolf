@@ -203,7 +203,8 @@ function showResultTable() {
         const sportScoreList = G_game.sports[sportName].players[playerName].scoreList;
 
         tableObject[sportName].scorelist = {};
-        for (var i = 0; i < sportScoreList.length; i++) {
+        //for (var i = 0; i < sportScoreList.length; i++) {
+        for (var i = 0; i < tableObject.currentHole; i++) {
           tableObject[sportName].scorelist[i] = sportScoreList[i];
         }
       })
