@@ -30,9 +30,13 @@ function settingsScreen() {
         <li> <input id="points12" value="1" class="settingInput" type="number" value></input></li>
       </ol>
       <hr>
-
+        <button id="clearLocaleStorageBtn" class="w3-btn w3-green"> Tyhjennä lokaalimuisti </button>
     </div>
     `);
+  $("#clearLocaleStorageBtn").click(()=>{
+    localStorage.clear();
+  });
+
   $("#maxStrokesID").change( () => {
     num = parseInt($("#maxStrokesID").val(), 10);
     G_game.maxStrokes =num;

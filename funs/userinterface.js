@@ -15,7 +15,7 @@ function startScreen() {
       <p/>
     	<button id="followGameBtn" class="w3-btn w3-green alaNapitGrid-item">Seuraa peliä</button>
       <p/>
-      <button id="playGameBtn" class="w3-btn w3-green alaNapitGrid-item">Liity peliin</button>
+      <button id="playGameBtn" class="w3-btn w3-green alaNapitGrid-item">Liity / Jatka</button>
     </div>`);
 
   $('#playGameBtn').click(() => {

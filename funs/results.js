@@ -164,7 +164,7 @@ function showResultTable() {
     }
   }
 
-
+// tableObject = yksi rivi (pelaaja)
   function formTableData() {
     console.log("formTableData()");
     tableObjectArr = []; //Alustus, Data vektori bootstrap tablelle
@@ -204,9 +204,14 @@ function showResultTable() {
         const sportScoreList = G_game.sports[sportName].players[playerName].scoreList;
 
         tableObject[sportName].scorelist = {};
-        //for (var i = 0; i < sportScoreList.length; i++) {
-        for (var i = 0; i <tableObject[sportName+'CurrentHole']-1; i++) {
+        // Vektorista objektiksi..
+        for (var i = 0; i < sportScoreList.length; i++) {
+        //for (var i = 0; i <tableObject[sportName+'CurrentHole']; i++) {
           tableObject[sportName].scorelist[i] = sportScoreList[i];
+        }
+        // Käymättä olevat väylät viivaksi
+        for (var i = sportScoreList.length-1; i > tableObject[sportName+'CurrentHole'] - 1; i--) {
+          tableObject[sportName].scorelist[i] = '-';
         }
       })
       tableObjectArr.push(tableObject);
