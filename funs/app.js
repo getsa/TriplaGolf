@@ -93,7 +93,7 @@ function initApp() {
       hideNavBar();
       $("#gameAppDiv").empty();
       document.getElementById('quickstart-sign-in').style.display = "block";
-      document.getElementById('quickstart-sign-in').textContent = 'Sign in with Google';
+      document.getElementById('quickstart-sign-in').textContent = 'Kirjaudu sisään google-tunnuksilla';
     }
     document.getElementById('quickstart-sign-in').disabled = false;
   });
