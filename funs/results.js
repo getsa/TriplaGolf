@@ -297,7 +297,7 @@ function showResultTable() {
     $('#resultTable').bootstrapTable('destroy');
     $('#resultTable').bootstrapTable({
       columns: tableColumns,
-      data: tableObjectArr
+      data: tableObjectArr,
     })
   }
 

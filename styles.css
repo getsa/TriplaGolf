@@ -221,6 +221,7 @@ button {
   color: red;
   border: none;
   background: none;
+
 }
 
 
@@ -273,9 +274,7 @@ ol {
 /* Resultstable */
 .currentHoleCol {
   font-weight: bold;
-
 }
-
 .sijoitusCol {
   font-weight: bold;
 }
