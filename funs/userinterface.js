@@ -28,6 +28,7 @@ function startScreen() {
      <div class="alaNapitGrid w3-container">
        <p/>
      	 <button id="createNewGameBtn" class="w3-btn w3-green alaNapitGrid-item">Uusi peli</button>
+       <hr>
        <button id="showFinishedGamesBtn" class="w3-btn w3-green alaNapitGrid-item">Vanhat pelit</button>
        <button id="showSettingsBtn" class="w3-btn w3-green alaNapitGrid-item">Asetukset</button>
      </div>`);
@@ -54,7 +55,7 @@ function startScreen() {
       $("#gameAppDiv").append(`
           <div class="w3-container">
             <div id="gameListID" class= "alaNapitGrid" style="display:none;"></div> <p/><p/>
-              <button id="lives_btn" class=" w3-btn w3-green alaNapitGrid-item"> LIVESEURANTA</button><p/>
+              <!--  <button id="lives_btn" class=" w3-btn w3-green alaNapitGrid-item"> LIVESEURANTA</button><p/> -->
               <button id="contGame_btn" class=" w3-btn w3-green alaNapitGrid-item"> Uusi ryhmä </button><p/>
               <button id="backToStart_btn" class=" w3-btn w3-green alaNapitGrid-item"> Takaisin </button><p/>
               <!-- <button id="setGame_btn" class=" w3-btn w3-green alaNapitGrid-item"> Pelin asetukset</button><p/> -->
@@ -102,7 +103,7 @@ function startScreen() {
   function listOnGoingGames(showResults=0) {
     $("#gameAppDiv").append(`
       <div class="w3-container">
-        <p id="ContinueGameTag" style="display:none;"> Kesken: </p>
+        <p id="ContinueGameTag" style="display:none;"> Jatka: </p>
         <div id="gameListID" class= "listaGrid" style="display:none;"></div>
       </div>
       `);

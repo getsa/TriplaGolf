@@ -11,6 +11,7 @@ function settingsScreen() {
   // Tähän lajikohtaiset maximimäärät ja pistemäärät päivittymään!
   $("#gameAppDiv").append(`
     <div class="w3-container">
+      <h3> Ei toimi vielä... </h3>
       <p> Max. tulos = + <input id="maxStrokesID" class="settingInput" type="number" value="${G_game.maxStrokes}"></input></p>
       <hr>
       <p> Pistejako:</p>

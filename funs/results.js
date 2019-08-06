@@ -274,22 +274,25 @@ function showResultTable() {
         field: `${sportName}CurrentHole`,
         title: 'Väylällä',
         class: 'currentHoleCol',
-        width: "25"
+        width: 25
 
       });
 
+      tableColumns.push({
+        field: sportName + 'Score',
+        title: '+/-',
+        sortable: true,
+        class: "sportSumOnResTab"
+      });
 
       Object.keys(tableObjectArr[0][sportName].scorelist).forEach((element, index, array) => {
         tableColumns.push({
           field: `${sportName}.scorelist.${index}`,
-          title: index + 1
+          title: index + 1,
+          width: "1"
         });
       });
-      tableColumns.push({
-        field: sportName + 'Score',
-        title: '+/-',
-        sortable: true
-      });
+
     }
 
     //console.log("tableColumns:");
@@ -298,6 +301,7 @@ function showResultTable() {
     $('#resultTable').bootstrapTable({
       columns: tableColumns,
       data: tableObjectArr,
+      class: "resultTable"
     })
   }
 

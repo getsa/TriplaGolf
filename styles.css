@@ -270,11 +270,17 @@ ol {
   width: 200px;
 
 }
+.resultTable {
 
+}
 /* Resultstable */
 .currentHoleCol {
   font-weight: bold;
 }
 .sijoitusCol {
   font-weight: bold;
+}
+.sportSumOnResTab {
+  font-weight: bold;
+    border-style: solid;
 }
