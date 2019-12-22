@@ -1,7 +1,7 @@
 // Kokonaistilanne, lajikohtaiset tulokset, hakee muitten tulokset pilvestä
 function showResultTable() {
   console.log("showResultTable()");
-  
+
   G_myTeam.players.length > 0 ? $('#NavBtnJatka').show() : $('#NavBtnJatka').hide();
   G_myTeam.status = "results";
   let tableObjectArr = []; //Datavektori bootstrap tablelle
@@ -49,9 +49,6 @@ function showResultTable() {
       .then(() => {showTable()})
       .catch(console.log("Error in updateGameDataFromCloud() when Päivitysnappi was pushed"));
   });
-
-//  console.log(G_myTeam.players.length > 0);
-
 
   if (G_myTeam.players.length == 0) {
     $("#backBtn").hide();
