@@ -12,6 +12,7 @@ function settingsScreen() {
       <button id="gameSettingsBtn" class="w3-btn w3-green"> Peliasetukset </button><br><br>
       <button id="debugBtn" class="w3-btn w3-green"> Säätö </button><br><br>
     </div>
+
     `);
 
   $("#gameSettingsBtn").click( () => gameSettingsScreen() );
@@ -22,18 +23,29 @@ function settingsScreen() {
     $("#gameAppDiv").append(`
       <div class="w3-container">
         <br>
+        <button id="changeSportsBtn" class="w3-btn w3-green"> Muuta Lajeja </button><br><br>
         <button id="maxSrokesBtn" class="w3-btn w3-green"> Maksimi PAR ylitys </button><br><br>
         <button id="pointsArrayBtn" class="w3-btn w3-green"> Pistejako </button><br><br>
       </div>
       `);
 
+      $("#changeSportsBtn").click( () => changeSportsScreen() );
       $("#maxSrokesBtn").click( () => maxStrokesScreen() );
       $("#pointsArrayBtn").click( () => pointsArrayScreen() );
 
       function maxStrokesScreen() {
         $("#gameAppDiv").empty();
+        $("#gameAppDiv").append(`
+          <div class="w3-container">
+            <br>
+            <input>
+          </div>
+          `);
       }
       function pointsArrayScreen() {
+        $("#gameAppDiv").empty();
+      }
+      function changeSportsScreen() {
         $("#gameAppDiv").empty();
       }
 
@@ -42,7 +54,7 @@ function settingsScreen() {
   function debugSettingsScreen() {
     $("#gameAppDiv").empty();
   }
-  
+
   // Tähän lajikohtaiset maximimäärät ja pistemäärät päivittymään!
   // $("#gameAppDiv").append(`
   //   <div class="w3-container">

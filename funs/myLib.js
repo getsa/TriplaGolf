@@ -5,6 +5,7 @@ class Database {
     this.players = [];
     this.sports = [];
     this.games = [];
+    this.info = [];
   }
 }
 

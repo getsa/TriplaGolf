@@ -3,13 +3,9 @@ p {margin-top: 1px; margin-bottom: 1px; padding: 2px 0px}
 a { cursor: pointer; }
 button{  border-radius: 5px;}
 
-input{
-  padding: 5px
-}
+input{padding: 5px}
 
-.w3-lobster {
-  font-family: "Lobster", serif;
-}
+.w3-lobster {font-family: "Lobster", serif;}
 
 #navBar {
   width: 100%;
@@ -56,7 +52,13 @@ input{
    width: 100%;
    text-align: center;
 }
-
+#logo {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width:300px;
+  height:200px;
+}
 #gameAppDiv {
   padding : 10px 10px 10px 10px;
 }
@@ -109,8 +111,6 @@ input{
   border-style: none;
 
 }
-
-
 .gameGrid {
   display: grid;
   grid-template-columns: 2fr 2fr 2fr 2fr 2fr;
@@ -120,7 +120,6 @@ input{
   vertical-align: middle;
   border-style: none;
 }
-
 .gameGrid-item  {
   /* background-color: rgba(255, 255, 255, 0.8); */
   text-align: center;
@@ -166,103 +165,63 @@ input{
   color: white;
 }
 
-#createNewGameBtn {
-  margin-top: 20px;
-}
-.check-mark {
-  color: green;
-}
-.fixed-list-item {
-  position: fixed;
-}
+#createNewGameBtn {margin-top: 20px;}
+.check-mark {color: green;}
+.fixed-list-item {position: fixed;}
 
 table {
     width: 100%
-    /* margin-left: auto; */
-    /* margin-right: auto; */
     padding: 0px;
     border-collapse: collapse;
 }
-.w3-table-all {
-  padding: 0px;
-}
+.w3-table-all {padding: 0px;}
 
-.table_condensed {
-  font-size: 10px;
-}
+.table_condensed {font-size: 10px;}
 
 td {
-  /* border: 1px solid #ddd; */
   padding: 4px;
   border: 0 px;
   text-align: center;
   border-collapse: collapse;
-
 }
 
 tr:hover {background-color: #ddd;}
 tr:nth-child(even){background-color: #f2f2f2}
-
 th{
-      border: 0 px solid #ddd;
-      padding: 4px;
-
+  border: 0 px solid #ddd;
+  padding: 4px;
 }
-
-img {
-}
-button {
-}
-
-/* inverse colors on hover */
-
 
 .removeObjButton {
   color: red;
   border: none;
   background: none;
-
 }
 
+a:link {text-decoration: none;}
+a:visited {text-decoration: none;}
+a:hover {text-decoration: underline;}
+a:active {text-decoration: underline;}
 
-a:link {
-    text-decoration: none;
+.w3-btn {
+  margin-bottom:2px;
+  border-radius: 10px;
 }
 
-a:visited {
-    text-decoration: none;
-}
+.button1 {padding: 0px 5px;}
 
-a:hover {
-    text-decoration: underline;
-}
-
-a:active {
-    text-decoration: underline;
-}
-.w3-btn {margin-bottom:2px;}
-
-.button1 {
-  /*float: center;*/
-  padding: 0px 5px;
-  /* width: 70px; */
-}
 .buttonPAR {
-  /*float: center;*/
   border: 1px solid green;
   display:inline-block;
 }
 .parButtonDiv{text-align:center}
 .gameOnScr {margin-left: auto;margin-right: auto;}
 .w3-button {padding: 5px 5px;margin-top: 0; margin-bottom: 0; }
-.w3-block {}
-
 
 .settingInput {
   width: 50px;
   text-align: center;
   justify-content: center;
-
 }
 ol {
   display:table;
@@ -270,17 +229,10 @@ ol {
   width: 200px;
 
 }
-.resultTable {
-
-}
 /* Resultstable */
-.currentHoleCol {
-  font-weight: bold;
-}
-.sijoitusCol {
-  font-weight: bold;
-}
+.currentHoleCol {font-weight: bold;}
+.sijoitusCol {font-weight: bold;}
 .sportSumOnResTab {
   font-weight: bold;
-    border-style: solid;
+  border-style: solid;
 }

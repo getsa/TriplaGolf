@@ -108,6 +108,7 @@ let collectionRefGames = firestore.collection("games");
 let collectionRefPlayers = firestore.collection("players");
 let collectionRefSports = firestore.collection("sports");
 let collectionRefLogins = firestore.collection("logins");
+let collectionRefInfoDocs = firestore.collection("InfoDocs");
 
 let G_database = new Database; //Kaikki data kaikista peleistä ja pelaajista
 let G_game = new Game("empty"); //Yksi ladattu peli, päivitys pilveen/pilvestä
@@ -181,6 +182,16 @@ function setLocaleStorage(){
 function loadFirebaseInitialData() {
   console.log("loadFirebaseInitialData()");
 
+  //Hae peli-info
+  collectionRefInfoDocs.get()
+  .then(function(querySnapshot) {
+      querySnapshot.forEach(function(doc) {
+        G_database.info.push(doc.data());
+
+      });
+  })
+  .catch(function(error) {console.log("Error getting games database: ", error);});
+
   //Hae pelaajat
   collectionRefPlayers.get()
   .then(function(querySnapshot) {
@@ -189,6 +200,7 @@ function loadFirebaseInitialData() {
       });
   })
   .catch(function(error) {console.log("Error getting player database: ", error);});
+
   //Hae pelit
   collectionRefGames.get()
   .then(function(querySnapshot) {
@@ -198,25 +210,22 @@ function loadFirebaseInitialData() {
       initGame();
   })
   .catch(function(error) {console.log("Error getting games database: ", error);});
+
+
 }
 
 //Valitse pelinäkymä ja päivitä tiedot pilvestä jos peli kesken
 // Alustaa G_gamen ja G_myTeamin jos pelit on loppu
 function initGame() {
-
-  //console.log('initGame()');
-  //console.log(G_game.players);
-  //console.log(G_myTeam);
-  //console.log("G_myTeam.status: " + G_myTeam.status);
+  updateGameInfo();
+  console.log('initGame()');
   if (G_myTeam.status=="empty") {
-
     let G_game = new Game("empty");
     let G_myTeam = new MyTeam;
     startScreen();
   }
 
   else if(G_myTeam.status=="results") {
-    //console.log('RESULTS:');
     new Promise((resolve, reject) => updateGameDataFromDatabase(resolve, reject))
     .then( () => showResultTable())
     .catch( () => console.log("updateGameDataFromDatabase() Failed in InitGame()"));
@@ -234,6 +243,15 @@ function initGame() {
   }
 }
 
+// Update no of games
+function updateGameInfo(){
+  G_database.info[0].NrAllGames = G_database.games.length;
+  G_database.info[0].NrOpenGames = 0;
+  G_database.games.forEach( (obj,ind) =>{
+    if (obj.status =="gameOn") G_database.info[0].NrOpenGames++;
+  });
+
+}
 // MUUTA ETTEI HÄVITÄ METHODEJA?
 function updateGameDataFromCloud(resolve, reject) {
   console.log("updateGameDataFromCloud()");
