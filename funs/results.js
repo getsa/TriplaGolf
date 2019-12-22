@@ -100,20 +100,16 @@ function showResultTable() {
     let playersArr = [];
     let totalRanking = [];
 
-    console.log(G_game);
     // PLayers to array
     Object.keys(G_game.players).forEach((playerName, ind, arr) => {
       playersArr.push(G_game.players[playerName]); //ARRAY OF REFS
     });
 
-   console.log(G_game.players);
-  //  console.log(playersArr);
     // PLayer sport positions
     Object.keys(G_game.sports).forEach((sportName, ind, arr) => {
       //Laske vain jos laji alkanut!, muuten nolla kaikille
       if (G_game.sports[sportName].status == 'notStarted') {
         playersArr.forEach((player, ind) => {
-          //console.log(player);
           G_game.players[player.name][sportName + 'Points'] = 0;
         });
       }
@@ -128,24 +124,18 @@ function showResultTable() {
         let maxScore = Math.max.apply(Math, playersArr.map(obj => {
           return obj[sportName + 'Score']
         }));
-
-        console.log(sportName +" max score: "+maxScore);
-
         let scoreArrays = []; //Array of Arrays of Objects
 
         // Sadan offsetti koska pisteet voi mennä miinukselle!
         for (var i = 0; i <= maxScore + 100; i++) {
           scoreArrays[i] = [];
         };
-      //  console.log(scoreArrays);
 
         //Lajitellaan pelaajat
         playersArr.forEach((player, ind) => {
-        //  console.log(player.name + " "+sportName + " " +player[sportName + 'Score']);
           scoreArrays[player[sportName + 'Score'] + 100].push(player);
-        //  console.log(scoreArrays[player[sportName + 'Score'] + 100]);
         });
-        //console.log(scoreArrays);
+
         // Poistetaan tyhjät rivit
         scoreArrays = scoreArrays.filter((el) => {
           return el.length > 0;
@@ -154,7 +144,6 @@ function showResultTable() {
         let nextPosition = 0;
 
         //SAmat pisteet kaikille joilla on sama lyöntimäärä
-        console.log(sportName);
         scoreArrays.forEach((scoreArr, ind) => {
           scoreArr.forEach((player, index) => {
             let pos = nextPosition;
@@ -174,10 +163,8 @@ function showResultTable() {
     // pointsArrays = [[Jussi, Jorma], [Olli], ...]
     let pointsArrays = [];
 
-console.log(playersArr);
     //Vektorin koko = maksimipisteiden määrä
     let maxPoints = Math.max.apply(Math, playersArr.map(obj => {
-      console.log(obj.pointsTot);
       return obj.pointsTot
     }));
 
@@ -205,7 +192,6 @@ console.log(playersArr);
       })
       nextPosition = pointArr.length - 1;
       index_reversed++;
-      console.log(pointArr);
     }
     resolve("OK");
   }

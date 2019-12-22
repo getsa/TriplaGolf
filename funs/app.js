@@ -179,8 +179,7 @@ function setLocaleStorage(){
 //Lataa pelit ja pelaajat firestoresta => kutsuu initGame:a kun valmis
 //     (OK)
 function loadFirebaseInitialData() {
-  console.log("loadFirebaseInitialData");
-  console.log("Loading data from cloud...");
+  console.log("loadFirebaseInitialData()");
 
   //Hae pelaajat
   collectionRefPlayers.get()
@@ -195,7 +194,6 @@ function loadFirebaseInitialData() {
   .then(function(querySnapshot) {
       querySnapshot.forEach(function(doc) {
         G_database.games.push(doc.data());
-        console.log(G_database);
       });
       initGame();
   })
@@ -238,23 +236,19 @@ function initGame() {
 
 // MUUTA ETTEI HÄVITÄ METHODEJA?
 function updateGameDataFromCloud(resolve, reject) {
-  console.log("updating " + G_game.name + " from cloud");
-  console.log(G_game);
+  console.log("updateGameDataFromCloud()");
   collectionRefGames.doc(G_game.name).get().then(function(doc) {
     if (doc.exists) {
       fetchedGameData = doc.data();
       setGameData(resolve, reject, fetchedGameData);
       //console.log(G_game);
-      console.log("updateGameDataFromCloud OK");
       resolve("JEP");
     } else {
         console.log("No such game in cloud!");
-        console.log("updateGameDataFromCloud FAILED");
         reject("NOPE");
     }
   }).catch(function(error) {
     console.log("Error getting game "+ G_game.name+" from cloud:", error);
-    console.log("updateGameDataFromCloud FAILED");
     reject("NOPE");
   });
 }
@@ -279,13 +273,11 @@ function updateGameDataFromDatabase(resolve, reject) {
 //Apufunktio - luo pelaaja ja sport objektit ja hakee datan sourcesta
 function setGameData(resolve, reject, fetchedGameData){
   console.log("setGameData()");
-  console.log(G_myTeam.gameName);
 
   G_game.status = fetchedGameData.status;
   G_game.name = fetchedGameData.name;
   G_game.maxStrokes = fetchedGameData.maxStrokes;
   G_game.currentSport = fetchedGameData.currentSport;
-  console.log(fetchedGameData);
   let playerLength =   Object.keys(fetchedGameData.players).length;
   let playersProcessed;
 
