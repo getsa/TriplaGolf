@@ -60,10 +60,8 @@ function showResultTable() {
       G_game.sports[G_myTeam.currentSport].status = "finished";
       G_myTeam = new MyTeam;
       setLocaleStorage();
-      //loadFirebaseInitialData();
       G_database = new Database;
       loadFirebaseInitialData()
-      //startScreen();
     });
   }
 
