@@ -37,18 +37,19 @@ function Player(name) {
 	}
 
 	this.setPoints = function() {
-		this.pointsTot = 0;
+    this.pointsTot = 0;
 		Object.keys(G_game.sports).forEach((sportName,ind,arr)=>{
       if (G_game.sports[sportName].status == 'notStarted') {
 
       }
       else {
+        // Jos pistevektori on lyhyempi kuin pelaajien määrä, anna minimipisteet
   			if(this[sportName + 'Position'] > G_points.length) {
   				this[sportName + 'Points'] = G_points[G_points.length-1];
   				this.pointsTot +=  this[sportName + 'Points'];
   			}
   			else {
-  				this[sportName + 'Points'] = G_points[this[sportName + 'Position']];
+  				this[sportName + 'Points'] = G_points[this[sportName + 'Position']-1];
   				this.pointsTot +=  this[sportName + 'Points'];
   			}
       }

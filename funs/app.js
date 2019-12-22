@@ -43,7 +43,7 @@ function toggleSignIn() {
 }
 function initApp() {
   firebase.auth().getRedirectResult().then(function(result) {
-    console.log("logging in");
+    console.log("Trying to login..");
     if (result.credential) {
       var token = result.credential.accessToken;
     }
@@ -80,7 +80,7 @@ function initApp() {
       photoURL: photoURL
       })
       .then(function() {
-          console.log("Document successfully written!");
+          console.log("Login info successfully written to cloud!");
       })
       .catch(function(error) {
           console.error("Error writing document: ", error);
@@ -89,7 +89,7 @@ function initApp() {
 
     } else {
       // User is signed out.
-      console.log('user signed out');
+      console.log('user is signed out');
       hideNavBar();
       $("#gameAppDiv").empty();
       document.getElementById('quickstart-sign-in').style.display = "block";
@@ -113,15 +113,16 @@ let G_database = new Database; //Kaikki data kaikista peleistä ja pelaajista
 let G_game = new Game("empty"); //Yksi ladattu peli, päivitys pilveen/pilvestä
 let G_myTeam = new MyTeam; //Pidetään kirjaa ketä on tässä pelissä mukana (vektori pelaajien nimistä)
 
-let G_points = [14, 12, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
+let G_points = [14, 12, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
+
 let G_maxStrokes = 7;
 
 // Hakee G_myTeamin localesta, alustaa G_gamen pelaaja ja laji objekteilla, muu data haetaan pilvestä
 // Kutsuu loadFirebaseInitialData:a kun valmis
 function getLocaleStorage(){
+  console.log("getLocaleStorage()");
   try {
     if (typeof(Storage) !== "undefined") {
-      console.log("Getting data from local storage..");
       let myTeamString = localStorage.getItem('G_myTeam');
       let sportNames = new Array;
       let playerNames = new Array;
@@ -138,6 +139,7 @@ function getLocaleStorage(){
         G_game.name = G_myTeam.gameName;
         playerNames.forEach( (playerName,ind,arr) => {
           G_game.players[playerName] = new Player(playerName);
+
         });
         sportNames.forEach((sportName,ind,arr) => {
           G_game.sports[sportName]=new Sport(sportName);
@@ -146,6 +148,9 @@ function getLocaleStorage(){
             G_game.sports[sportName].players[playerName] = new Player(playerName);
           });
         });
+      }
+      else {
+        console.log("localeStorage empty");
       }
       loadFirebaseInitialData();
     }
@@ -174,7 +179,9 @@ function setLocaleStorage(){
 //Lataa pelit ja pelaajat firestoresta => kutsuu initGame:a kun valmis
 //     (OK)
 function loadFirebaseInitialData() {
+  console.log("loadFirebaseInitialData");
   console.log("Loading data from cloud...");
+
   //Hae pelaajat
   collectionRefPlayers.get()
   .then(function(querySnapshot) {
@@ -188,6 +195,7 @@ function loadFirebaseInitialData() {
   .then(function(querySnapshot) {
       querySnapshot.forEach(function(doc) {
         G_database.games.push(doc.data());
+        console.log(G_database);
       });
       initGame();
   })
@@ -197,19 +205,22 @@ function loadFirebaseInitialData() {
 //Valitse pelinäkymä ja päivitä tiedot pilvestä jos peli kesken
 // Alustaa G_gamen ja G_myTeamin jos pelit on loppu
 function initGame() {
-  console.log('initGame()');
-  console.log(G_myTeam);
-  console.log("G_myTeam.status: " + G_myTeam.status);
+
+  //console.log('initGame()');
+  //console.log(G_game.players);
+  //console.log(G_myTeam);
+  //console.log("G_myTeam.status: " + G_myTeam.status);
   if (G_myTeam.status=="empty") {
 
     let G_game = new Game("empty");
     let G_myTeam = new MyTeam;
     startScreen();
   }
+
   else if(G_myTeam.status=="results") {
     //console.log('RESULTS:');
     new Promise((resolve, reject) => updateGameDataFromDatabase(resolve, reject))
-    .then( () => showResultTable() )
+    .then( () => showResultTable())
     .catch( () => console.log("updateGameDataFromDatabase() Failed in InitGame()"));
   }
   else if(G_myTeam.status=="sportOn") {
@@ -228,33 +239,37 @@ function initGame() {
 // MUUTA ETTEI HÄVITÄ METHODEJA?
 function updateGameDataFromCloud(resolve, reject) {
   console.log("updating " + G_game.name + " from cloud");
-  //console.log(G_game);
+  console.log(G_game);
   collectionRefGames.doc(G_game.name).get().then(function(doc) {
     if (doc.exists) {
       fetchedGameData = doc.data();
-      setGameData(fetchedGameData);
-      console.log(G_game);
+      setGameData(resolve, reject, fetchedGameData);
+      //console.log(G_game);
+      console.log("updateGameDataFromCloud OK");
       resolve("JEP");
     } else {
         console.log("No such game in cloud!");
+        console.log("updateGameDataFromCloud FAILED");
         reject("NOPE");
     }
   }).catch(function(error) {
     console.log("Error getting game "+ G_game.name+" from cloud:", error);
+    console.log("updateGameDataFromCloud FAILED");
     reject("NOPE");
   });
 }
 
 // Asettaa alkulatauksessa G_gamen datan G_databasesta.
 // Eli luo objektit ja päivittää niihin pilvestä haetut datat
-//   OK
 function updateGameDataFromDatabase(resolve, reject) {
   console.log("updateGameDataFromDatabase()");
   let fetchedGameData = G_database.games.find(e => e.name == G_myTeam.gameName);
 
   if (fetchedGameData) {
-    setGameData(fetchedGameData);
-    resolve("OK!");
+
+    new Promise((resolve, reject) => setGameData(resolve, reject, fetchedGameData))
+    .then( () => {console.log("setGameDataOK");resolve("OK!")} )
+    .catch( () => reject("ERROR") );
   }
   else {
     reject("ERROR");
@@ -262,22 +277,34 @@ function updateGameDataFromDatabase(resolve, reject) {
 }
 
 //Apufunktio - luo pelaaja ja sport objektit ja hakee datan sourcesta
-function setGameData(fetchedGameData){
+function setGameData(resolve, reject, fetchedGameData){
   console.log("setGameData()");
+  console.log(G_myTeam.gameName);
 
   G_game.status = fetchedGameData.status;
   G_game.name = fetchedGameData.name;
   G_game.maxStrokes = fetchedGameData.maxStrokes;
   G_game.currentSport = fetchedGameData.currentSport;
+  console.log(fetchedGameData);
+  let playerLength =   Object.keys(fetchedGameData.players).length;
+  let playersProcessed;
 
   Object.keys(fetchedGameData.players).forEach( (playerName,ind,arr) => {
     G_game.players[playerName] = new Player(playerName);
     let tempObj = JSON.parse( JSON.stringify(fetchedGameData.players[playerName]) );
     G_game.players[playerName].pointsTot = tempObj.pointsTot;
     G_game.players[playerName].position = tempObj.position;
+    playersProcessed = ind;
   })
 
+  // VAriables to check that forEach has finished
+  let sportLength = Object.keys(fetchedGameData.sports).length;
+  let sportPlayersLength;
+  var sportsProcessed;
+  let sportPlayersProcessed;
+
   Object.keys(fetchedGameData.sports).forEach( (sportName,ind,arr) => {
+    sportPlayersLength = Object.keys(fetchedGameData.players).length; //Number of players in the last sport
     G_game.sports[sportName]=new Sport(sportName);
     let tempObj = JSON.parse( JSON.stringify(fetchedGameData.sports[sportName]) );
     G_game.sports[sportName].maxScore = [...tempObj.maxScore];
@@ -286,6 +313,8 @@ function setGameData(fetchedGameData){
     G_game.sports[sportName].totalPar = tempObj.totalPar;
     G_game.sports[sportName].status = tempObj.status;
     G_game.sports[sportName].maxSetting = tempObj.maxSetting;
+    sportsProcessed = ind;
+
     Object.keys(fetchedGameData.players).forEach( (playerName,ind,arr) => {
       G_game.sports[sportName].players[playerName] = new Player(playerName);
       G_game.players[playerName].addSportPoints(sportName);
@@ -298,6 +327,10 @@ function setGameData(fetchedGameData){
       G_game.players[playerName][sportName+'Position'] = tempObjPlayer[sportName+'Position'];
       G_game.sports[sportName].players[playerName].scoreList = tempObjSportPlayer.scoreList;
       G_game.players[playerName][sportName+'CurrentHole'] = tempObjPlayer[sportName+'CurrentHole'];
+      sportPlayersProcessed = ind;
+
+      if (sportsProcessed == (sportLength-1) && sportPlayersProcessed == (sportPlayersLength-1))
+          resolve("OK!")
     })
   })
 }

@@ -1,5 +1,13 @@
 // Kokonaistilanne, lajikohtaiset tulokset, hakee muitten tulokset pilvestä
 function showResultTable() {
+
+  if (false) {
+    console.log(G_game);
+    return false;
+
+  }
+
+  console.log("showResultTable()");
   G_myTeam.players.length > 0 ? $('#NavBtnJatka').show() : $('#NavBtnJatka').hide();
   G_myTeam.status = "results";
   let tableObjectArr = []; //Datavektori bootstrap tablelle
@@ -43,12 +51,13 @@ function showResultTable() {
     //console.log("UPDATE");
     new Promise((resolve, reject) => updateGameDataFromCloud(resolve, reject))
       .then(() => updateRanking())
-      .then(() => formTableData())
-      .then(() => showTable())
+      .then(() => {formTableData()})
+      .then(() => {showTable()})
       .catch(console.log("Error in updateGameDataFromCloud() when Päivitysnappi was pushed"));
   });
 
 //  console.log(G_myTeam.players.length > 0);
+
 
   if (G_myTeam.players.length == 0) {
     $("#backBtn").hide();
@@ -57,7 +66,6 @@ function showResultTable() {
   else {
     $("#backBtn").click(() => gameScreen());
     $("#continueBtn").click(() => {
-      console.log();
       G_game.sports[G_myTeam.currentSport].status = "finished";
       G_myTeam = new MyTeam;
       setLocaleStorage();
@@ -69,33 +77,43 @@ function showResultTable() {
   }
 
 
-  // Hae data pilvestä ja päitiä taulukko vasta sitten
+
+  // Hae data pilvestä --> Muodosta taulukkodata --> päivitä taulukko vasta sitten
   new Promise((resolve, reject) => updateGameDataFromCloud(resolve, reject))
-    .then(() => updateRanking())
-    .then(() => formTableData())
-    .then(() => showTable())
+    .then(() => {
+        new Promise((resolve, reject) => updateRanking(resolve, reject) )
+            .then( () => {
+                new Promise((resolve, reject) => formTableData(resolve, reject) )
+                  .then( () => showTable())
+                  .catch(() => console.log("Error in formTableData when loading showResultTable()"));
+                })
+            .catch(() => console.log("Error in updateRanking when loading showResultTable()"));
+        })
     .catch(() => console.log("Error in updateGameDataFromCloud when loading showResultTable()"));
 
 
-  function updateRanking() {
-    console.log("updating ranking...");
+
+  function updateRanking(resolve, reject) {
+    console.log("updateRanking()");
     // Lajisijoitukset => lajipisteet
     let sportNames = Object.keys(G_game.sports);
     let playersArr = [];
     let totalRanking = [];
 
+    console.log(G_game);
     // PLayers to array
     Object.keys(G_game.players).forEach((playerName, ind, arr) => {
       playersArr.push(G_game.players[playerName]); //ARRAY OF REFS
     });
-  //  console.log(G_game.players);
+
+   console.log(G_game.players);
+  //  console.log(playersArr);
     // PLayer sport positions
     Object.keys(G_game.sports).forEach((sportName, ind, arr) => {
-
       //Laske vain jos laji alkanut!, muuten nolla kaikille
       if (G_game.sports[sportName].status == 'notStarted') {
         playersArr.forEach((player, ind) => {
-          console.log(player);
+          //console.log(player);
           G_game.players[player.name][sportName + 'Points'] = 0;
         });
       }
@@ -110,49 +128,75 @@ function showResultTable() {
         let maxScore = Math.max.apply(Math, playersArr.map(obj => {
           return obj[sportName + 'Score']
         }));
+
+        console.log(sportName +" max score: "+maxScore);
+
         let scoreArrays = []; //Array of Arrays of Objects
+
+        // Sadan offsetti koska pisteet voi mennä miinukselle!
         for (var i = 0; i <= maxScore + 100; i++) {
           scoreArrays[i] = [];
         };
+      //  console.log(scoreArrays);
+
         //Lajitellaan pelaajat
         playersArr.forEach((player, ind) => {
+        //  console.log(player.name + " "+sportName + " " +player[sportName + 'Score']);
           scoreArrays[player[sportName + 'Score'] + 100].push(player);
+        //  console.log(scoreArrays[player[sportName + 'Score'] + 100]);
         });
+        //console.log(scoreArrays);
         // Poistetaan tyhjät rivit
         scoreArrays = scoreArrays.filter((el) => {
           return el.length > 0;
         });
+
         let nextPosition = 0;
+
+        //SAmat pisteet kaikille joilla on sama lyöntimäärä
+        console.log(sportName);
         scoreArrays.forEach((scoreArr, ind) => {
           scoreArr.forEach((player, index) => {
             let pos = nextPosition;
             player[sportName + 'Position'] = nextPosition + 1;
             player.setPoints();
           })
+
           nextPosition += scoreArr.length; //0 0 1 1 0
         });
       }
+
+
     });
-
-
-
     //  TOTAL POSITIONIN LASKENTA
-    let pointsArrays = []; //Array of Arrays of Objects
+    //Array of Array of Objects, Eli lajitellaan pelaajat pisteiden mukaan
+    //vektoriin ja jos on samat pisteet ni pelaajat menevät vektoriksi vektoriin
+    // pointsArrays = [[Jussi, Jorma], [Olli], ...]
+    let pointsArrays = [];
+
+console.log(playersArr);
+    //Vektorin koko = maksimipisteiden määrä
     let maxPoints = Math.max.apply(Math, playersArr.map(obj => {
+      console.log(obj.pointsTot);
       return obj.pointsTot
     }));
 
+    //Alustus vektoreiksi nollasta maksimimäärään
     for (var i = 0; i <= maxPoints; i++) {
       pointsArrays[i] = [];
     };
+
     playersArr.forEach((player, ind) => {
       pointsArrays[player.pointsTot].push(player);
     });
+
     pointsArrays = pointsArrays.filter((el) => {
       return el.length > 0;
     });
     let nextPosition = 0;
     let index_reversed = 0;
+
+    let processed;
 
     for (var i = pointsArrays.length - 1; i >= 0; i--) {
       pointArr = pointsArrays[i];
@@ -161,17 +205,18 @@ function showResultTable() {
       })
       nextPosition = pointArr.length - 1;
       index_reversed++;
+      console.log(pointArr);
     }
+    resolve("OK");
   }
 
 // tableObject = yksi rivi (pelaaja)
-  function formTableData() {
+  function formTableData(resolve, reject) {
     console.log("formTableData()");
     tableObjectArr = []; //Alustus, Data vektori bootstrap tablelle
     //let sportPlayers = G_game.sports[G_myTeam.currentSport].players; //REF
     let tableObject = new Object;
     let tableColumns = [];
-
 
     // Poimi pelaajadata
     Object.keys(G_game.players).forEach((playerName, index, array) => {
@@ -186,7 +231,6 @@ function showResultTable() {
         tableObject[sportName] = {};
         // Aseta viivat pisteiden tilalle jos lajia ei ole aloitettu
         tableObject[sportName+'CurrentHole'] =playerObj[sportName+'CurrentHole'];
-        console.log(tableObject);
         // console.log("G_game.sports["+sportName+"].status: " + G_game.sports[sportName].status);
 
         //Korjaa pistemäärä?
@@ -218,6 +262,7 @@ function showResultTable() {
     })
     // console.log('tableObjectArr');
     // console.log(tableObjectArr);
+    resolve("OK")
     return tableObjectArr;
 
   }
