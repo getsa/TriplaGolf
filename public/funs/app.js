@@ -10,7 +10,7 @@
 //Firebase config
 let config = {
   apiKey: "AIzaSyAEaRb-PxgqlQKR3w94m60SahLZW8Y5CUo",
-  authDomain: "triplagolf.firebaseapp.com",
+  authDomain: "triplagolf.web.app",
   databaseURL: "https://triplagolf.firebaseio.com",
   projectId: "triplagolf",
   storageBucket: "triplagolf.appspot.com",
