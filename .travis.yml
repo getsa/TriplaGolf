@@ -1,5 +1,5 @@
 language: node_js
-no_js:
+node_js:
   -"13.8.0"
 script:
     -echo "Deploying!"
