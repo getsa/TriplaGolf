@@ -12,7 +12,7 @@ function startScreen() {
   $("#gameAppDiv").empty();
   $("#gameAppDiv").append(`
     <div class="alaNapitGrid w3-container">
-      <img id="logo" src="triplagolf2019.gif" >
+      <img id="logo" src="triplagolf.gif" >
       <p/>
     	<button id="followGameBtn" class="w3-btn w3-green alaNapitGrid-item">Seuraa</button>
       <p/>
