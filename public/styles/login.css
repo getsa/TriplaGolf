@@ -1,0 +1,15 @@
+
+.login_button_img {
+  width: 191px;
+  align="middle";
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 200px;
+}
+.red {
+  background-color: red;
+}
+.green {
+  background-color: green;
+}

@@ -1,8 +1,14 @@
 // Käyttöliittymä / "screenit"
 
+
+
 // Listaa pelit, luo uuden pelin, asettaa G_gamen valittuun, nollaa joukkueen
 function startScreen() {
 
+
+
+
+  $("#gameAppDiv").show();
   //G_myTeam.status == "sportOn" ? $('#NavBtnJatka').show() : $('#NavBtnJatka').hide();
   G_game.name == "empty" ? $('#NavBtnResults').hide() : $('#NavBtnResults').show();
   G_myTeam.players.length > 0 ? $('#NavBtnJatka').show() : $('#NavBtnJatka').hide();
@@ -179,6 +185,11 @@ function startScreen() {
 }
 
 //  Luo uudet lajit, lisää valitut lajit gameen (continue tallentaa pelin pilveen)
+function setNewGame() {
+  $('#id01').slideDown()
+}
+
+
 function selectSportsScreen() {
   console.log("Näytöllä: selectSportsScreen ");
   let parNr;
@@ -599,4 +610,11 @@ function gameScreen() {
       saveGame2cloud();
     });
   });
+}
+
+function loginScreen() {
+$("#vueApp").append(`
+  <login-button id="quickstart-sign-in" v-show="loginButtonDisplay=='loginActive'" ></login-button>
+	<login-button-inactive id="quickstart-sign-in-inactive" v-show="loginButtonDisplay=='loginInActive'"></login-button>
+  `)
 }

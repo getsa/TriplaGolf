@@ -1,4 +1,17 @@
 // Yläpalkki infotaulu
+
+Vue.component('nav-bar'),{
+  template: `
+  <div>
+    <a id="NavBtnHome" class="w3-bar-item w3-button w3-padding-small"> <i class='material-icons'> home </i> </a>
+    <a id="NavBtnSettings" class="w3-bar-item w3-button w3-padding-small"> <i class='material-icons'> settings </i></a>
+    <a id="NavBtnResults" class="w3-bar-item w3-button w3-padding-small"> Live seuranta </a>
+    <a id="NavBtnJatka" class="w3-bar-item w3-button w3-padding-small"> Jatka </a>
+  </div>
+  `
+}
+
+
 function updateInfoDiv(str) {
   $("#infoDiv").empty();
 
@@ -15,13 +28,16 @@ function hideNavBar() {
 }
 
 function showNavBar() {
+  $("#navBar").show();
   $("#navBar").append(`
     <a id="NavBtnHome" class="w3-bar-item w3-button w3-padding-small"><i class='material-icons'> home </i> </a>
     <a id="NavBtnSettings" class="w3-bar-item w3-button w3-padding-small"><i class='material-icons'> settings </i></a>
     <a id="NavBtnResults" class="w3-bar-item w3-button w3-padding-small"> Live seuranta </a>
     <a id="NavBtnJatka" class="w3-bar-item w3-button w3-padding-small"> Jatka </a>
-    <button disabled id="quickstart-sign-out" class= "w3-button w3-blue w3-bar-item w3-tiny w3-right" href="#"> Sign out</button>
   	`);
+
+  //  <button disabled id="quickstart-sign-out" class= "w3-button w3-blue w3-bar-item w3-tiny w3-right" href="#"> Sign out</button>
+  //  <logoutButton v-show="logoutButtonDisplay=='logoutActive'" > </logoutButton>
 
   $('#quickstart-sign-out').click(() => toggleSignIn());
   $('#NavBtnHome').click(() => startScreen());

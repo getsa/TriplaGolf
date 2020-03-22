@@ -25,25 +25,12 @@ firestore.settings(settings);
 window.onload = function() {
  initApp();
 };
-//window.onpagehide = function() {
-  //setLocaleStorage();
-//};
 
-//Google sign in/out
-function toggleSignIn() {
-  if (!firebase.auth().currentUser) {
-    var provider = new firebase.auth.GoogleAuthProvider();
-    provider.addScope('https://www.googleapis.com/auth/plus.login');
-    firebase.auth().signInWithRedirect(provider);
-  } else {
-    firebase.auth().signOut();
-  }
-  document.getElementById('quickstart-sign-in').disabled = true;
-  document.getElementById('quickstart-sign-out').disabled = true;
-}
+//Kirjautuu firebaseen ja jatkaa getLocaleStorage:en jos kirjautuminen onnistui
 function initApp() {
   firebase.auth().getRedirectResult().then(function(result) {
     console.log("Trying to login..");
+    vueApp.loginState = 'logging in'
     if (result.credential) {
       var token = result.credential.accessToken;
     }
@@ -69,15 +56,18 @@ function initApp() {
       console.log('user: '+email+" signed in");
       var photoURL = user.photoURL;
       var uid = user.uid;
-      document.getElementById('quickstart-sign-in').style.display = "none";
-      showNavBar();
+
+
+
+      $('body').css('background-image', 'url("./images/background.jpg")');
+      vueApp.screenState = 'startScreen'
+      vueApp.loginState = 'logged in';
       getLocaleStorage();
-      document.getElementById('quickstart-sign-out').disabled = false;
       // Save login to info to cloud
       firestore.collection("logins").doc(uid).set({
-      displayName: displayName,
-      email: email,
-      photoURL: photoURL
+        displayName: displayName,
+        email: email,
+        photoURL: photoURL
       })
       .then(function() {
           console.log("Login info successfully written to cloud!");
@@ -85,21 +75,14 @@ function initApp() {
       .catch(function(error) {
           console.error("Error writing document: ", error);
       });
-
-
-    } else {
-      // User is signed out.
-      console.log('user is signed out');
-      hideNavBar();
-      $("#gameAppDiv").empty();
-      document.getElementById('quickstart-sign-in').style.display = "block";
-      document.getElementById('quickstart-sign-in').textContent = 'Kirjaudu sisään google-tunnuksilla';
     }
-    document.getElementById('quickstart-sign-in').disabled = false;
-  });
-
-  document.getElementById('quickstart-sign-in').addEventListener('click', toggleSignIn, false);
-
+    else {
+        // User is signed out.
+        console.log('user is signed out');
+        vueApp.loginState = 'logged out';
+    }
+    //document.getElementById('quickstart-sign-in').addEventListener('click', toggleSignIn, false);
+  })
 }
 
 
@@ -222,7 +205,7 @@ function initGame() {
   if (G_myTeam.status=="empty") {
     let G_game = new Game("empty");
     let G_myTeam = new MyTeam;
-    startScreen();
+    //startScreen();
   }
 
   else if(G_myTeam.status=="results") {
@@ -253,6 +236,7 @@ function updateGameInfo(){
 
 }
 // MUUTA ETTEI HÄVITÄ METHODEJA?
+
 function updateGameDataFromCloud(resolve, reject) {
   console.log("updateGameDataFromCloud()");
   collectionRefGames.doc(G_game.name).get().then(function(doc) {

@@ -1,6 +1,8 @@
 // Kokonaistilanne, lajikohtaiset tulokset, hakee muitten tulokset pilvestä
 function showResultTable() {
   console.log("showResultTable()");
+  $("#titleBox").show();
+  $("#navBar").show();
 
   G_myTeam.players.length > 0 ? $('#NavBtnJatka').show() : $('#NavBtnJatka').hide();
   G_myTeam.status = "results";
@@ -10,6 +12,7 @@ function showResultTable() {
   $("#gameAppDiv").empty();
 
   // Ylärivin valintanapit (muuttuva grid jako lajien määrän mukaan)
+  //$("#navBar").hide();
   $("#gameAppDiv").append(`
     <div id="selectResultTableDiv" class="resTableSelGrid">
       <button id="totalResultsBtn" class="w3-button w3-green resTableSelGrid-item w3-small">Kokonaistilanne</button>
@@ -17,7 +20,6 @@ function showResultTable() {
   $(`#totalResultsBtn`).click(() => {
     showTable('Total');
   });
-
   const sportsKeys = Object.keys(G_game.sports);
   $(".resTableSelGrid").css("grid-template-columns", `repeat(${sportsKeys.length+1}, 1fr)`);
   for (const sport of sportsKeys) {

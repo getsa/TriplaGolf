@@ -5,18 +5,25 @@ function settingsScreen() {
 
   $("#gameAppDiv").empty();
   $("#infoDiv").hide();
+
   //Main elements
   $("#gameAppDiv").append(`
     <div class="w3-container">
       <br>
       <button id="gameSettingsBtn" class="w3-btn w3-green"> Peliasetukset </button><br><br>
       <button id="debugBtn" class="w3-btn w3-green"> Säätö </button><br><br>
+      <logout-button id="quickstart-sign-out"> </logout-button>
     </div>
 
     `);
 
+
+
+
   $("#gameSettingsBtn").click( () => gameSettingsScreen() );
   $("#debugBtn").click( () => debugSettingsScreen() );
+
+
 
   function gameSettingsScreen() {
     $("#gameAppDiv").empty();
@@ -96,4 +103,6 @@ function settingsScreen() {
       })
     }
   })
+
+
 }

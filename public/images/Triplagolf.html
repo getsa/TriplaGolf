@@ -37,13 +37,11 @@
 
 	<!--  TITLE  -->
 
-	<!-- ISO LOGO -->
-	<div class="" v-if="screenState == 'startScreen' || screenState == 'loginScreen'">
+	<div class="" v-if="screenState == 'startScreen'">
 		<p/><p/><p/><p/><p/>
 		<img id="logo" src="triplagolf.gif" ><p/><p/>
 	</div>
 
-	<!-- PIENI LOGO -->
 	<div id="titleBox" class="w3-container w3-center w3-xxlarge w3-lobster titleBoxLarge " v-if="screenState != 'startScreen' && loginState == 'logged in'">
 		 {{MainTitle}} <img src="logo.gif" style="width:60px;height:60px; ">
 	</div>
@@ -51,15 +49,26 @@
 	<!-- MAIN APP -->
 
 	<div id="gameAppDiv" class="w3-container" v-if="loginState == 'logged in'">
-
-		<div id="startScreenDiv" class='mainButtonGrid' v-if="screenState=='startScreen'">
-    	<button class="w3-btn mainButtonGrid-item w3-green w3-border" v-if="gameState=='gameOn'" v-on:click="screenState='resultsScreen'"> Seuraa currentGameName </button>
-      <button class="w3-btn mainButtonGrid-item w3-green w3-border" v-if="gameState!='gameOn'"  v-on:click="screenState='setNewGameScreen';">Luo uusi peli</button>
-			<button class="w3-btn mainButtonGrid-item w3-green w3-border" v-on:click="screenState='settingsScreen'"> Peliasetukset </button>
+		<div class='mainButtonGrid' v-if="screenState=='startScreen'">
+    	<button class="w3-btn mainButtonGrid-item"  > Seuraa </button>
+      <button class="w3-btn mainButtonGrid-item"> Liity / Jatka / Luo uusi</button>
+			<button class="w3-btn mainButtonGrid-item" v-on:click="screenState='settingsScreen'"> Peliasetukset </button>
 		</div>
 
-		<newgamecard  v-if="screenState=='setNewGameScreen'"></newgamecard>
-		<settings  v-if="screenState=='settingsScreen'"></settings>
+		<div id="settingsScreenDiv" class="w3-container settingsButtonGrid" v-if="screenState=='settingsScreen'">
+
+      <button class="settingsButtonGrid-item w3-btn w3-green"> Pistejako </button>
+			<button class="settingsButtonGrid-item w3-btn w3-green"> Maksimilyönnit </button>
+      <button class="settingsButtonGrid-item w3-btn w3-green"> Säätö </button>
+			<div class="settingsButtonGrid-item"></div>
+			<div class="OkButtonGrid settingsButtonGrid-item">
+				<button class="OkButtonGrid-item w3-btn w3-green" onclick="vueApp.gameSettings = vueApp.TempGameSettings" v-on:click="screenState='startScreen'">Tallenna</button>
+				<button class="OkButtonGrid-item w3-btn w3-green"v-on:click="screenState='startScreen'" >Peruuta</button>
+			</div>
+			<div class='w3-bottom'>
+				<button class=" w3-btn w3-red" v-on:click="toggleSignIn"> Logout </button>
+			</div>
+		</div>
 
 
 	</div>
@@ -67,10 +76,9 @@
 	<div id="infoDiv" class="w3-container startScr w3-center w3-large" style="display:none;"> </div>
 
 	<!-- LOGGING -->
-	<div id='loginButtonDiv' class='w3-container w3-center' v-if="screenState=='loginScreen'">
-		<img src='images/btn_google_signin_dark_pressed_web.png' class="login_button_img" v-if="loginState=='logged out'" v-on:click="toggleSignIn" alt='login'></img>
-		<img src='images/btn_google_signin_dark_disabled_web.png' class="login_button_img"  v-if="loginState=='logging in'" alt="login_disabled"></img>
-	</div>
+	<img src='images/btn_google_signin_dark_pressed_web.png' class="login_button_img" v-if="loginState=='logged out'" v-on:click="toggleSignIn" alt='login'></img>
+	<button v-if="loginState=='logging in'"> LoginInActice </button>
+
 
 
 
@@ -82,6 +90,37 @@
 </div>
 
 
+<!-- Code injected by live-server -->
+<script type="text/javascript">
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function() {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					head.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					head.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function(msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			console.log('Live reload enabled.');
+		})();
+	}
+	// ]]>
+</script>
 </body>
 <script src="funs/userinterface.js"></script>
 <script src="funs/myLib.js"></script>
