@@ -109,6 +109,7 @@ let collectionRefPlayers = firestore.collection("players");
 let collectionRefSports = firestore.collection("sports");
 let collectionRefLogins = firestore.collection("logins");
 let collectionRefInfoDocs = firestore.collection("InfoDocs");
+let collectionRefLoggers = firestore.collection("loggers");
 
 let G_database = new Database; //Kaikki data kaikista peleistä ja pelaajista
 let G_game = new Game("empty"); //Yksi ladattu peli, päivitys pilveen/pilvestä
@@ -380,6 +381,47 @@ function savePlayer2cloud(player) {
   firestore.collection('players').doc(playerDoc).set(playerData);
 }
 
+function getTimeStamp() {
+  var today = new Date();
+  var h = today.getHours();
+  var m = today.getMinutes();
+  var s = today.getSeconds();
+  var day = today.getDate();
+  let month = today.getMonth()+1;
+  let year = today.getYear();
+  m = checkTime(m);
+  s = checkTime(s);
+
+  let aikaleima = h + ":" + m + ":" + s +" " + day + "/" + month + "/" + year ;
+  return aikaleima;
+
+  function checkTime(i) {
+  if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
+  return i;
+}
+
+
+}
+
+function savePointLoggerData2Cloud(message) {
+
+  let time = getTimeStamp();
+  let user =  firebase.auth().currentUser.email;
+
+  firestore.collection("loggers").add({
+  message: message,
+  user: user,
+  time: time,
+  game: G_game.name,
+  sport: G_game.currentSport
+  })
+  .then(function() {
+      console.log("Logger info successfully written to cloud!");
+  })
+  .catch(function(error) {
+      console.error("Error writing document: ", error);
+  });
+}
 
 
 //EI KÄYTÖSSÄ!

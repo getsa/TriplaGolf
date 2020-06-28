@@ -29,7 +29,7 @@ function showResultTable() {
 
   // pistetaulukko
   $("#gameAppDiv").append(`
-    <table id="resultTable" class="table-sm table_condensed" data-sortable="true" data-sort-name="position" ></table>`);
+    <table id="resultTable" class="table-sm table_condensed table-light table-responsive" data-sortable="true" data-sort-name="position" ></table>`);
 
   // alanapit
   $("#gameAppDiv").append(`
@@ -251,17 +251,19 @@ function showResultTable() {
     if (tableName == "Total") {
       tableColumns.push({
         field: 'position',
-        title: '',
+        title: 'Sija',
         sortable: true,
         class: 'sijoitusCol'
       });
       tableColumns.push({
         field: 'name',
+        sortable: true,
         title: 'Pelaaja'
       });
       tableColumns.push({
         field: 'pointsTot',
-        title: 'Kokonaispisteet'
+        sortable: true,
+        title: 'Yht.pisteet'
       });
       // Laji scoret ja pisteet
       Object.keys(G_game.sports).forEach((sportName, index, array) => {

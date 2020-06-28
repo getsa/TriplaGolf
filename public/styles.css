@@ -1,3 +1,7 @@
+body {
+  background-image: url('background_blur.jpg');
+}
+
 h1 {text-align:center;}
 p {margin-top: 1px; margin-bottom: 1px; padding: 2px 0px}
 a { cursor: pointer; }
@@ -177,6 +181,18 @@ table {
 .w3-table-all {padding: 0px;}
 
 .table_condensed {font-size: 10px;}
+
+.table-responsive::-webkit-scrollbar {
+    -webkit-appearance: none;
+}
+
+.table-responsive::-webkit-scrollbar:vertical {
+    width: 12px;
+}
+
+.table-responsive::-webkit-scrollbar:horizontal {
+    height: 12px;
+}
 
 td {
   padding: 4px;
