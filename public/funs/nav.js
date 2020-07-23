@@ -22,6 +22,7 @@ function showNavBar() {
     <a id="NavBtnResults" class="w3-bar-item w3-button w3-padding-small"> Live seuranta </a>
     <a id="NavBtnJatka" class="w3-bar-item w3-button w3-padding-small"> Jatka </a>
     <button disabled id="quickstart-sign-out" class= "w3-button w3-blue w3-bar-item w3-tiny w3-right" href="#"> Sign out</button>
+    <a class="w3-right" >v2.1</a>
   	`);
 
     $('#NavBtnResults').hide();
