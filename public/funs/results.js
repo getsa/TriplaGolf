@@ -1,6 +1,7 @@
 // Kokonaistilanne, lajikohtaiset tulokset, hakee muitten tulokset pilvestä
 function showResultTable() {
   console.log("showResultTable()");
+  $('#quickstart-sign-out').hide();
 
   G_myTeam.players.length > 0 ? $('#NavBtnJatka').show() : $('#NavBtnJatka').hide();
   G_myTeam.status = "results";
@@ -11,19 +12,20 @@ function showResultTable() {
 
   // Ylärivin valintanapit (muuttuva grid jako lajien määrän mukaan)
   $("#gameAppDiv").append(`
+    <p> <b>LIVE SEURANTA: </b><b id=resultsTableTitleId></b> </p>
     <div id="selectResultTableDiv" class="resTableSelGrid">
       <button id="totalResultsBtn" class="w3-button w3-green resTableSelGrid-item w3-small">Kokonaistilanne</button>
     </div>`);
   $(`#totalResultsBtn`).click(() => {
     showTable('Total');
   });
-
   const sportsKeys = Object.keys(G_game.sports);
   $(".resTableSelGrid").css("grid-template-columns", `repeat(${sportsKeys.length+1}, 1fr)`);
   for (const sport of sportsKeys) {
     $("#selectResultTableDiv").append(`<button class="w3-button w3-green resTableSelGrid-item w3-small" id = "totalResultsBtn_${sport}" >${sport}</button>`);
     $(`#totalResultsBtn_${sport}`).click(() => {
       showTable(sport);
+      $("#resultsTableTitleId").text(sport);
     });
   }
 
@@ -40,9 +42,9 @@ function showResultTable() {
       <button id="backBtn" class="w3-btn w3-green alaNapitGrid-item"> Takasin </button>
       <button id="continueBtn" class="w3-btn w3-green alaNapitGrid-item">Lopeta ${G_myTeam.currentSport}</button>
     </div>`);
-
   $("#updateBtn").click(() => {
     //console.log("UPDATE");
+    location.reload();
     new Promise((resolve, reject) => updateGameDataFromCloud(resolve, reject))
       .then(() => updateRanking())
       .then(() => {formTableData()})
@@ -56,16 +58,20 @@ function showResultTable() {
   }
   else {
     $("#backBtn").click(() => gameScreen());
+    if (G_myTeam.currentHole == G_game.sports[G_myTeam.currentSport].parNr) {
+      $("#continueBtn").show();
+    } else {
+      $("#continueBtn").hide();
+    }
     $("#continueBtn").click(() => {
       G_game.sports[G_myTeam.currentSport].status = "finished";
+      G_myTeam.currentHole = 1;
       G_myTeam = new MyTeam;
       setLocaleStorage();
       G_database = new Database;
       loadFirebaseInitialData()
     });
   }
-
-
 
   // Hae data pilvestä --> Muodosta taulukkodata --> päivitä taulukko vasta sitten
   new Promise((resolve, reject) => updateGameDataFromCloud(resolve, reject))
@@ -79,8 +85,6 @@ function showResultTable() {
             .catch(() => console.log("Error in updateRanking when loading showResultTable()"));
         })
     .catch(() => console.log("Error in updateGameDataFromCloud when loading showResultTable()"));
-
-
 
   function updateRanking(resolve, reject) {
     console.log("updateRanking()");
@@ -110,9 +114,14 @@ function showResultTable() {
         //[Sami] ]
 
         // Luodaan riittävän iso tyhjä vektori
+
         let maxScore = Math.max.apply(Math, playersArr.map(obj => {
-          return obj[sportName + 'Score']
+          if (obj[sportName + 'Score'] !== undefined) {
+            return obj[sportName + 'Score']
+          }
+
         }));
+
         let scoreArrays = []; //Array of Arrays of Objects
 
         // Sadan offsetti koska pisteet voi mennä miinukselle!
@@ -123,6 +132,7 @@ function showResultTable() {
         //Lajitellaan pelaajat
         playersArr.forEach((player, ind) => {
           scoreArrays[player[sportName + 'Score'] + 100].push(player);
+
         });
 
         // Poistetaan tyhjät rivit
@@ -142,6 +152,7 @@ function showResultTable() {
 
           nextPosition += scoreArr.length; //0 0 1 1 0
         });
+
       }
 
 
@@ -156,7 +167,6 @@ function showResultTable() {
     let maxPoints = Math.max.apply(Math, playersArr.map(obj => {
       return obj.pointsTot
     }));
-
     //Alustus vektoreiksi nollasta maksimimäärään
     for (var i = 0; i <= maxPoints; i++) {
       pointsArrays[i] = [];
@@ -169,18 +179,15 @@ function showResultTable() {
     pointsArrays = pointsArrays.filter((el) => {
       return el.length > 0;
     });
-    let nextPosition = 0;
-    let index_reversed = 0;
 
-    let processed;
+    let nextPosition = 1;
 
     for (var i = pointsArrays.length - 1; i >= 0; i--) {
       pointArr = pointsArrays[i];
       pointArr.forEach((player, index) => {
-        player.position = nextPosition + index_reversed + 1;
+        player.position = nextPosition;
       })
-      nextPosition = pointArr.length - 1;
-      index_reversed++;
+      nextPosition = nextPosition + pointArr.length
     }
     resolve("OK");
   }
@@ -248,6 +255,9 @@ function showResultTable() {
 
     tableColumns = [];
 
+    /* HEADERIN MUODOSTUS*/
+
+    //  Headerin 3 ekaa
     if (tableName == "Total") {
       tableColumns.push({
         field: 'position',
@@ -265,7 +275,7 @@ function showResultTable() {
         sortable: true,
         title: 'Yht.pisteet'
       });
-      // Laji scoret ja pisteet
+      // //  Headeri: Laji sijat ja pisteet
       Object.keys(G_game.sports).forEach((sportName, index, array) => {
         //console.log(sportName);
         tableColumns.push({
@@ -273,6 +283,7 @@ function showResultTable() {
           title: `${sportName} sij.`,
           sortable: true
         });
+
         //tableColumns.push({field: `${sportName}Score` ,title: `${sportName} +/-`,sortable: true});
         tableColumns.push({
           field: `${sportName}Points`,

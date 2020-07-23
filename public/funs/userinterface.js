@@ -2,24 +2,36 @@
 
 // Listaa pelit, luo uuden pelin, asettaa G_gamen valittuun, nollaa joukkueen
 function startScreen() {
+  $('#NavBtnHome').hide();
+  $('#NavBtnResults').hide();
+  $('#NavBtnJatka').hide();
+  $('#quickstart-sign-out').show();
 
-  //G_myTeam.status == "sportOn" ? $('#NavBtnJatka').show() : $('#NavBtnJatka').hide();
-  G_game.name == "empty" ? $('#NavBtnResults').hide() : $('#NavBtnResults').show();
-  G_myTeam.players.length > 0 ? $('#NavBtnJatka').show() : $('#NavBtnJatka').hide();
+
 
   console.log("Näytöllä: startScreen");
   //  updateInfoDiv('Lets mennään!');
   $("#gameAppDiv").empty();
+
   $("#gameAppDiv").append(`
     <div class="alaNapitGrid w3-container">
       <img id="logo" src="triplagolf.gif" >
       <p/>
-    	<button id="followGameBtn" class="w3-btn w3-green alaNapitGrid-item">Seuraa tilannetta</button>
+    	<button id="followGameBtn" class="w3-btn w3-green alaNapitGrid-item">Seuraa!</button>
       <p/>
-      <button id="playGameBtn" class="w3-btn w3-green alaNapitGrid-item">Jatka peliä tai luo uusi</button>
-
-
+      <button id="playGameBtn" class="w3-btn w3-green alaNapitGrid-item">Liity peliin tai luo uusi</button>
+      <p/><p/>
+      <button id="endGameBtn" class="w3-btn w3-green alaNapitGrid-item">Lopeta ${G_game.name}</button>
+      <!-- <button id="clearMemoryBtn" class="w3-btn w3-green alaNapitGrid-item">Tyhjennä muisti</button> -->
     </div>`);
+
+  // Piilota "liveseuranta" palkista jos peliä ei valittu
+  G_game.name == "empty" ? $('#NavBtnResults').hide() : $('#NavBtnResults').hide();
+
+  //Piilota "jatka" palkista jos et ole aloittanut kirjaamista
+  G_myTeam.players.length > 0 ? $('#NavBtnJatka').show() : $('#NavBtnJatka').hide();
+  // Näytä lopeta peli vain miikalle jos peli valittu
+  (G_myTeam.players.length == 0) && (firebase.auth().currentUser.email == "miikka.ketonen@gmail.com") ? $('#endGameBtn').show(): $('#endGameBtn').hide();
 
   $('#playGameBtn').click(() => {
     $("#gameAppDiv").empty();
@@ -37,27 +49,41 @@ function startScreen() {
     $('#showSettingsBtn').click(() => settingsScreen());
     $('#showFinishedGamesBtn').click(() => showFinishedGamesScreen());
   });
-
   $('#followGameBtn').click(() => {
     $("#gameAppDiv").empty();
     listOnGoingGames(1);
   });
+  $('#endGameBtn').click(() => {
+    G_game.status = "gameFinished";
+    saveGame2cloud();
+    deleteLocaleStorage();
+    location.reload();
+  });
+  $('#clearMemoryBtn').click(() => {
+    deleteLocaleStorage();
+    location.reload();
+  });
 
-
-  // Valitse näytettävät alanapit
-  function chooseResContSet(showResults=0) {
+  // Valitse näytettävät alanapit VOI POISTAA?
+  function chooseResContSet(showResults = 0) {
+    $('#NavBtnHome').show();
+    $('#NavBtnResults').hide();
+    $('#NavBtnJatka').hide();
+    $('#quickstart-sign-out').hide();
 
     if (showResults) {
       showResultTable();
-    }
-    else {
+    } else {
+      selectGroupScreen();
+
       $("#gameAppDiv").empty();
       $("#gameAppDiv").append(`
           <div class="w3-container">
             <div id="gameListID" class= "alaNapitGrid" style="display:none;"></div> <p/><p/>
               <!--  <button id="lives_btn" class=" w3-btn w3-green alaNapitGrid-item"> LIVESEURANTA</button><p/> -->
-              <button id="contGame_btn" class=" w3-btn w3-green alaNapitGrid-item"> Uusi ryhmä </button><p/><p/><p/><p/>
-              <button id="backToStart_btn" class=" w3-btn w3-green alaNapitGrid-item"> Takaisin </button><p/>
+              <p/><p/>
+              <button id="contGame_btn" class=" w3-btn w3-green alaNapitGrid-item"> Luo uusi ryhmä </button><p/><p/><p/><p/>
+              <!--<button id="backToStart_btn" class=" w3-btn w3-green alaNapitGrid-item"> Takaisin </button><p/> -->
               <!-- <button id="setGame_btn" class=" w3-btn w3-green alaNapitGrid-item"> Pelin asetukset</button><p/> -->
           </div>
           `);
@@ -73,9 +99,10 @@ function startScreen() {
       });
     }
   }
+
   //Uusi peli
   function createNewGame() {
-    if (window.confirm('Haluatko varmasti luoda uuden pelin? Keskeneräisiä pelejä käynnissä: '+G_database.games.length+' kappaletta')) {
+    if (window.confirm('Haluatko varmasti luoda kokonaan uuden oman monilaji-pelin?')) {
       let name = prompt("Pelin nimi:", "");
       console.log(G_database);
       let existingGame = G_database.games.find(e => e.name === name);
@@ -99,50 +126,103 @@ function startScreen() {
       }
     }
   }
+
   //Listataan keskeneräiset pelit
-  function listOnGoingGames(showResults=0) {
-    $("#gameAppDiv").append(`
-      <div class="w3-container">
-        <p id="ContinueGameTag" style="display:none;"> Jatka keskeneräistä peliä: </p>
-        <div id="gameListID" class= "listaGrid" style="display:none;"></div>
-      </div>
-      `);
-    //console.log(G_database);
-    if (G_database.games.length==0) {
+  function listOnGoingGames(showResults = 0) {
+    $('#quickstart-sign-out').hide();
+    $('#NavBtnHome').show();
+    // Päävalikon "Seuraa peliä nappi"
+    if (showResults == 1) {
       $("#gameAppDiv").append(`
+        <div class="w3-container">
+          <p id="ContinueGameTag" style="display:none;"> Valitse peli: </p>
+          <div id="gameListID" class= "listaGrid" style="display:none;"></div>
+          <p id="FinishedGamesTag" style="display:none;"> Loppuneet pelit: </p>
+          <div id="finishedGamesListID" class= "listaGrid" style="display:none;"></div>
+        </div>
+        `);
+    }
+    //Päävalikon jatka peliä nappi
+    else {
+      $("#gameAppDiv").append(`
+        <div class="w3-container">
+          <p id="ContinueGameTag" style="display:none;"> Lisää uusi ryhmä peliin: </p>
+          <div id="gameListID" class= "listaGrid" style="display:none;"></div>
+          <p id="FinishedGamesTag" style="display:none;"> Loppuneet pelit: </p>
+          <div id="finishedGamesListID" class= "listaGrid" style="display:none;"></div>
+        </div>
+        `);
+      }
+
+
+      if (G_database.games.length == 0) {
+        $("#gameAppDiv").append(`
         <div class="w3-container">
           <p> Ei pelejä menossa </p>
 
         </div>
         `);
-    }
-    else {
-      //Listataan keskeneräiset pelit
-      G_database.games.forEach((game, i) => {
-        $("#gameListID").show();
-        if (game.status == "gameOn") {
-          $("#ContinueGameTag").show();
+      } else {
+        //Listataan keskeneräiset pelit
+        G_database.games.forEach((game, i) => {
 
-          let gamesListItemID = `${game.name}_gamesListItemID`;
-          gamesListItemID = gamesListItemID.replace(/\s+/g, '');
-          $("#gameListID").append(`
-            <button id="${gamesListItemID}" class="w3-btn w3-amber listaGrid-item" >${game.name}</button><p/>
-            `);
-          $(`#${gamesListItemID}`).data("gameobj", game);
 
-          //Valitaan vanha peli:
-          $(`#${gamesListItemID}`).click(function() {
-            let game_obj = $(this).data("gameobj");
-            Object.assign(G_game, game_obj);
-            G_myTeam.gameName = G_game.name;
-            G_myTeam.players = [];
-            chooseResContSet(showResults);
-            //selectGroupScreen();
-            //$('#NavBtnResults').show();
-          });
-        }
-      });
-    }
+          if (game.status == "gameOn" || game.status == "gameFinished") {
+
+            let gamesListItemID = `${game.name}_gamesListItemID`;
+            gamesListItemID = gamesListItemID.replace(/\s+/g, '');
+
+            if (game.status == "gameOn") {
+              $("#ContinueGameTag").show();
+              $("#gameListID").show();
+              $("#gameListID").append(`
+                <button id="${gamesListItemID}" class="w3-btn w3-amber listaGrid-item" >${game.name}</button><p/>
+                `);
+            }
+
+            if (game.status == "gameFinished") {
+              $("#FinishedGamesTag").show();
+              $("#finishedGamesListID").show();
+              $("#finishedGamesListID").append(`
+                <button id="${gamesListItemID}" class="w3-btn w3-blue listaGrid-item" >${game.name}</button><p/>
+                `);
+            }
+
+            $(`#${gamesListItemID}`).data("gameobj", game);
+
+            //Valitaan keskeneräinen peli:
+            if (game.status == "gameOn") {
+              $(`#${gamesListItemID}`).click(function() {
+                let game_obj = $(this).data("gameobj");
+                Object.assign(G_game, game_obj);
+                G_myTeam.gameName = G_game.name;
+                G_myTeam.players = [];
+
+                if (showResults==1) {
+                  showResultTable();
+                }
+                else {
+                  selectGroupScreen();
+                }
+
+              });
+
+              //Valitaan loppuneet peli: Näytä tulos ruutu
+            } else if (game.status == "gameFinished") {
+              $(`#${gamesListItemID}`).click(function() {
+                let game_obj = $(this).data("gameobj");
+                Object.assign(G_game, game_obj);
+                G_myTeam.gameName = G_game.name;
+                G_myTeam.players = [];
+                //  Näytä tulos ruutu
+                showResultTable();
+                //selectGroupScreen();
+                //$('#NavBtnResults').show();
+              });
+            }
+          }
+        });
+      }
   }
 
   // Listaa vanhat loppuun pelatut pelit
@@ -180,6 +260,10 @@ function startScreen() {
 
 //  Luo uudet lajit, lisää valitut lajit gameen (continue tallentaa pelin pilveen)
 function selectSportsScreen() {
+  $('#NavBtnHome').show();
+  $('#NavBtnResults').hide();
+  $('#NavBtnJatka').hide();
+  $('#quickstart-sign-out').hide();
   console.log("Näytöllä: selectSportsScreen ");
   let parNr;
   //let parList = [];
@@ -200,7 +284,7 @@ function selectSportsScreen() {
     </div>
     <div class="w3-container alaNapit">
       <div class="alaNapitGrid w3-container">
-  	     <button id="newSportBtn" class=" alaNapitGrid-item w3-btn w3-green" > Uusi laji </button>
+  	     <button id="newSportBtn" class=" alaNapitGrid-item w3-btn w3-green" > Lisää uusi laji </button>
   	     <button id="continueBtn" class="alaNapitGrid-item w3-btn w3-green" style="display:none;"> Jatka </button>
       </div>
 
@@ -209,8 +293,8 @@ function selectSportsScreen() {
       <div class="w3-modal-content">
         <div class="w3-content">
           <span onclick="document.getElementById('id01').style.display='none'" class="w3-btn w3-display-topright">&times;</span>
-            <p>Laji:</p><input id="newSportNameID" class="w3-input" type="text"> </input>
-            <p>Väylämäärä / Eriä: </p>
+            <p>Lajin nimi:</p><input id="newSportNameID" class="w3-input" type="text"> </input>
+            <p>Väylämäärä: </p>
             <input id="newSportParNrID" type="number" name="parNr" class="w3-input"> </input>
             <div id="newSportParListID"></div>
             <button id="inputNewSportOKBtn" class="w3-btn w3-green" > OK </button>
@@ -301,12 +385,13 @@ function selectGroupScreen() {
 
   $("#gameAppDiv").empty();
   $("#gameAppDiv").append(`
-    <p>Valitse pelaajat:</p>
+    <p>Valitse ryhmäsi:</p>
       <div class="playerNameList" style="width:80%; margin-left: auto;margin-right: auto;"><p/>
       </div>
     <div class="alaNapitGrid w3-container">
-      <button id="newPlayerBtn" class="w3-btn w3-green alaNapitGrid-item"> Uusi pelaaja </button>
-      <button id="startBtn" class="w3-btn w3-green alaNapitGrid-item"> Aloita </button>
+      <button id="newPlayerBtn" class="w3-btn w3-green alaNapitGrid-item"> Luo uusi pelaaja </button>
+      <p/>
+      <button id="startBtn" class="w3-btn w3-green alaNapitGrid-item"> Jatka  &#8594;</button>
     </div>
     `);
 
@@ -315,7 +400,7 @@ function selectGroupScreen() {
     let player = new Player(G_database.players[i].name);
     let parentID = `.playerNameList`;
     let listItemID = `${player.name}_namelistID`;
-    $(parentID).append(`<button class="w3-btn w3-light-grey" id='${listItemID}'> ${player.name} </button>`);
+    $(parentID).append(`<button style="width: 30% ;margin: 5px; padding: 5px" class="w3-btn w3-light-grey" id='${listItemID}'> ${player.name} </button>`);
 
     $(`#${listItemID}`).data("playerName", player.name);
     $(`#${listItemID}`).click(function() {
@@ -330,6 +415,7 @@ function selectGroupScreen() {
 
     let playerName = prompt("Nimi:", "");
     if (playerName != null) {
+      playerName = playerName.replace(/\s/g, ''); //Poistaa välilyönnit
       let player = new Player(playerName);
       savePlayer2cloud(player);
       G_myTeam.players.push(playerName);
@@ -397,7 +483,7 @@ function selectGroupScreen() {
       selectNextSport();
 
     } else {
-      alert('Valitse joukkueesi!');
+      alert('Valitse ryhmäsi!');
     }
   });
 }
@@ -412,7 +498,7 @@ function selectNextSport() {
   $("#gameAppDiv").empty();
   let listItemID = "";
   $("#gameAppDiv").append(`
-    <p>Valitse laji:</p>
+    <p>Valitse seuraava laji:</p>
       <div class="alaNapitGrid startSportsListID" style="width:80%; margin-left: auto;margin-right: auto;"><p/>
       </div>
     </p>`);
@@ -434,11 +520,12 @@ function selectNextSport() {
       G_game.status = "gameOn";
       G_game.sports[sportName].status = "sportOn";
       console.log("G_game.status: " + G_game.status);
-      console.log("G_game.sports["+sportName+"].status: " + G_game.sports[sportName].status);
+      console.log("G_game.sports[" + sportName + "].status: " + G_game.sports[sportName].status);
       setLocaleStorage();
       saveGame2cloud();
       gameScreen();
       savePointLoggerData2Cloud("Uusi pisteiden muokkaus");
+      G_myTeam.currentHole = 1;
     });
   });
 
@@ -446,9 +533,11 @@ function selectNextSport() {
 
 //Pelin kulku, tallennus pilveen siirryttäessä seuraavaan väylään tai refreshattaessa sivu
 function gameScreen() {
-  $('#NavBtnHome').show();
+
+  $('#NavBtnHome').hide();
   $('#NavBtnResults').show();
   $('#NavBtnJatka').hide();
+  $('#quickstart-sign-out').hide();
 
   G_myTeam.status = "sportOn";
 
@@ -488,8 +577,7 @@ function gameScreen() {
 
   if (G_myTeam.currentHole == sport.parNr) {
     $('#finishSportButton').show();
-  }
-  else {
+  } else {
     $('#finishSportButton').hide();
   }
 
@@ -502,32 +590,77 @@ function gameScreen() {
       let playerName = G_myTeam.players[key];
       let scoreID = `score_${playerName}`;
       $(`#${scoreID}`).text(G_game.sports[sportName].players[playerName].scoreList[G_myTeam.currentHole - 1]); // Henk. koht. pistemäärä näytölle
-      G_game.players[playerName][sportName+'CurrentHole'] = G_myTeam.currentHole; // Henk. koht. tämänhetkinen reikä
+      //G_game.players[playerName][sportName + 'CurrentHole'] = G_myTeam.currentHole; // Henk. koht. tämänhetkinen reikä
     });
-
+    $('#finishSportButton').hide();
     setLocaleStorage();
     saveGame2cloud();
   });
 
+
+function wait(ms)
+{
+    var d = new Date();
+    var d2 = null;
+    do { d2 = new Date(); }
+    while(d2-d < ms);
+}
+
+
   $(`#holeButtonNext`).click(() => {
-    (G_myTeam.currentHole < sport.parNr) && G_myTeam.currentHole++;
-    $('#holeNrID').text(G_myTeam.currentHole);
-    $('#parID').text(sport.parList[G_myTeam.currentHole - 1]);
 
-    Object.keys(G_myTeam.players).forEach(function(key, index) {
-      let playerName = G_myTeam.players[key];
-      let scoreID = `score_${playerName}`;
-      $(`#${scoreID}`).text(G_game.sports[sportName].players[playerName].scoreList[G_myTeam.currentHole - 1]); // Henk. koht. pistemäärä näytölle
-      G_game.players[playerName][sportName+'CurrentHole'] = G_myTeam.currentHole; // Henk. koht. tämänhetkinen reikä
-    });
+    var ifConnected = window.navigator.onLine;
 
-    if (G_myTeam.currentHole == sport.parNr) {
-      $('#finishSportButton').show();
+    if (!ifConnected) {
+
+      console.log('Not connected to internet!');
+      wait(1000);
+      ifConnected = window.navigator.onLine;
+      if (!ifConnected) {
+        console.log('Not connected to internet!');
+        wait(1000);
+        if (!ifConnected) {
+          console.log('Not connected to internet!');
+          wait(1000);
+          if (!ifConnected) {
+            console.log('Not connected to internet!');
+            wait(1000);
+            if (!ifConnected) {
+              console.log('Not connected to internet!');
+              wait(1000);
+            }
+          }
+        }
+      }
     }
 
+    if (!ifConnected) {
+      alert ('Netti tökkii, ei voida tallentaa :( ')
+    }
 
-    setLocaleStorage();
-    saveGame2cloud();
+    if (ifConnected) {
+      (G_myTeam.currentHole < sport.parNr) && G_myTeam.currentHole++;
+      $('#holeNrID').text(G_myTeam.currentHole);
+      $('#parID').text(sport.parList[G_myTeam.currentHole - 1]);
+
+      Object.keys(G_myTeam.players).forEach(function(key, index) {
+        let playerName = G_myTeam.players[key];
+        let scoreID = `score_${playerName}`;
+        $(`#${scoreID}`).text(G_game.sports[sportName].players[playerName].scoreList[G_myTeam.currentHole - 1]); // Henk. koht. pistemäärä näytölle
+        if (G_game.players[playerName][sportName + 'CurrentHole'] < G_myTeam.currentHole) {
+          G_game.players[playerName][sportName + 'CurrentHole'] = G_myTeam.currentHole; // Henk. koht. tämänhetkinen reikä
+        }
+        console.log("hole next painettu:");
+        console.log("G_game.players[playerName][sportName + 'CurrentHole'] :" + G_game.players[playerName][sportName + 'CurrentHole']);
+        console.log("G_myTeam.currentHole: " + G_myTeam.currentHole);
+      });
+
+      if (G_myTeam.currentHole == sport.parNr) {
+        $('#finishSportButton').show();
+      }
+      setLocaleStorage();
+      saveGame2cloud();
+    }
   });
 
   $(`#finishSportButton`).click(() => {
@@ -590,10 +723,10 @@ function gameScreen() {
       let sportPlayer = $(this).data("sportPlayer");
       let player = $(this).data("player");
       if (sportPlayer.scoreList[G_myTeam.currentHole - 1] <= sport.maxScore[G_myTeam.currentHole - 1]) {
-        console.log("Scorelist of " + sportPlayer.name + " aka " + player.name);
-        console.log(sportPlayer.scoreList);
+        //console.log("Scorelist of " + sportPlayer.name + " aka " + player.name);
+        //console.log(sportPlayer.scoreList);
         ++sportPlayer.scoreList[G_myTeam.currentHole - 1];
-        console.log(sportPlayer.scoreList);
+        //console.log(sportPlayer.scoreList);
         ++player[sportName + 'Score'];
       }
       $(`#${scoreID}`).text(sportPlayer.scoreList[G_myTeam.currentHole - 1]);

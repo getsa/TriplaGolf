@@ -115,6 +115,7 @@ let G_database = new Database; //Kaikki data kaikista peleistä ja pelaajista
 let G_game = new Game("empty"); //Yksi ladattu peli, päivitys pilveen/pilvestä
 let G_myTeam = new MyTeam; //Pidetään kirjaa ketä on tässä pelissä mukana (vektori pelaajien nimistä)
 
+
 let G_points = [14, 12, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
 
 let G_maxStrokes = 7;
@@ -253,6 +254,7 @@ function updateGameInfo(){
   });
 
 }
+
 // MUUTA ETTEI HÄVITÄ METHODEJA?
 function updateGameDataFromCloud(resolve, reject) {
   console.log("updateGameDataFromCloud()");
@@ -299,6 +301,12 @@ function setGameData(resolve, reject, fetchedGameData){
   G_game.currentSport = fetchedGameData.currentSport;
   let playerLength =   Object.keys(fetchedGameData.players).length;
   let playersProcessed;
+
+  if (G_game.status == "gameFinished") {
+    if (G_myTeam.status == "sportOn") {
+      startScreen();
+    }
+  }
 
   Object.keys(fetchedGameData.players).forEach( (playerName,ind,arr) => {
     G_game.players[playerName] = new Player(playerName);
@@ -423,17 +431,20 @@ function savePointLoggerData2Cloud(message) {
   });
 }
 
-
-//EI KÄYTÖSSÄ!
 function deleteLocaleStorage() {
   console.log('deleteLocaleStorage()');
   if (typeof(localStorage) !== "undefined") {
-      //localStorage.removeItem('G_scrName');
+      localStorage.removeItem('G_game_players_keys');
+      localStorage.removeItem('G_game_sports_keys');
+      localStorage.removeItem('G_myTeam');
+
 
   } else {
       console.log("Selain ei tue localStoragea");
   }
 }
+//EI KÄYTÖSSÄ!
+
 
 function deleteDocument(ref) {
   console.log('deleteDocument()');
